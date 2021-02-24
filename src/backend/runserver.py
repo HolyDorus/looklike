@@ -1,4 +1,7 @@
-from looklike import app
+from looklike import create_app
+from looklike.configs import config
 
 
-app.run()
+if __name__ == "__main__":
+    app = create_app(config)
+    app.run()
