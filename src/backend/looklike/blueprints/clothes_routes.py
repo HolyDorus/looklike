@@ -5,10 +5,11 @@ from looklike.serializers import ClothesSerializer
 from looklike.models import Clothes
 
 
-clothes_bp = Blueprint('clothes_bp', __name__, url_prefix='/api/v1/')
+url_prefix = '/api/v1/clothes/'
+clothes_bp = Blueprint('clothes_bp', __name__, url_prefix=url_prefix)
 
 
-@clothes_bp.route('clothes/', methods=['GET'])
+@clothes_bp.route('', methods=['GET'])
 def get_clothes():
     # URL example:  /api/v1/clothes?primary_only
     if 'primary_only' in request.args:
@@ -19,7 +20,9 @@ def get_clothes():
     # URL example:  /api/v1/clothes?parent_id=10
     parent_id = request.args.get('parent_id')
     if parent_id:
-        if not parent_id.isdigit():
+        try:
+            parent_id = int(parent_id)
+        except ValueError:
             return jsonify(
                 {'message': 'Argument \'parent_id\' must be integer!'}
             ), 400
