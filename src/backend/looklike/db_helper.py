@@ -1,5 +1,3 @@
-from psycopg2 import sql
-
 from looklike.database import get_db_cursor
 from looklike.exceptions import ObjectNotFoundException
 from looklike.models import Clothes, Character
