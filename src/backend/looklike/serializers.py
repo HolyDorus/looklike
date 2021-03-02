@@ -1,5 +1,6 @@
 from typing import Union
 
+from looklike.configs import config
 from looklike.models import Clothes, Character
 
 
@@ -13,10 +14,14 @@ class ClothesSerializer():
 
     @staticmethod
     def serialize_one(clothes: Clothes) -> dict:
+        base_url = 'http://127.0.0.1:5000'
+        media_url = config.MEDIA_URL
+        image_url = f'{base_url}{media_url}{clothes.image_path}'
+
         return {
             'id': clothes.id,
             'name': clothes.name,
-            'image_path': clothes.image_path,
+            'image_path': image_url,
             'parent_id': clothes.parent_id
         }
 
@@ -28,7 +33,7 @@ class ClothesSerializer():
                 continue
 
             serialized = ClothesSerializer.serialize_one(clothes)
-            children = ClothesSerializer.get_children(clothes, primary_clothes)
+            children = ClothesSerializer._get_children(clothes, primary_clothes)
 
             serialized['children'] = [
                 ClothesSerializer.serialize_one(child) for child in children
@@ -38,7 +43,7 @@ class ClothesSerializer():
         return result
 
     @staticmethod
-    def get_children(clothes: Clothes, clothing_list: list[Clothes]) -> list[Clothes]:
+    def _get_children(clothes: Clothes, clothing_list: list[Clothes]) -> list[Clothes]:
         children = [cl for cl in clothing_list if cl.parent_id == clothes.id]
         return children        
 
