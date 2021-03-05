@@ -29,23 +29,35 @@ def get_characters():
 
         return jsonify(CharactersSerializer.serialize(character))
 
-    # URL example:  /api/v1/characters?by_clothes=[2,9]
-    by_clothes = request.args.get('by_clothes')
-    if by_clothes:
+    # URL example:  /api/v1/characters?clothes=[2,9]
+    clothes_list = request.args.get('clothes')
+    if clothes_list:
         try:
-            clothes_ids = get_ids_from_string(by_clothes)
+            clothes_ids = get_ids_from_string(clothes_list)
         except ValueError:
             return jsonify({
                 'message': 
-                    'Argument \'by_clothes\' must be array of integers!'
+                    'Argument \'clothes\' must be array of integers!'
             }), 400
 
         try:
+            characters_with_their_clothes = []
             characters = DBHelper.get_characters_by_clothes(clothes_ids)
+
+            for character in characters:
+                clothes = DBHelper.get_character_clothes(character)
+                characters_with_their_clothes.append({
+                    'character': character,
+                    'clothes': clothes
+                })
         except ObjectNotFoundException as e:
             return jsonify({'message': str(e)}), 404
             
-        return jsonify(CharactersSerializer.serialize(characters))
+        return jsonify(
+            CharactersSerializer.serialize_characters_with_clothes(
+                characters_with_their_clothes
+            )
+        )
 
     # URL example:  /api/v1/characters
     all_characters = DBHelper.get_all_characters()

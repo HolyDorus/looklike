@@ -58,13 +58,28 @@ class CharactersSerializer():
 
     @staticmethod
     def serialize_one(character: Character) -> dict:
+        base_url = 'http://127.0.0.1:5000'
+        media_url = config.MEDIA_URL
+        image_url = f'{base_url}{media_url}{character.image_path}'
+        
         return {
             'id': character.id,
             'author_id': character.author_id,
-            'image_path': character.image_path,
+            'image_path': image_url,
             'description': character.description,
             'posted_at': {
-                'min': character.posted_at.strftime('%d.%m.%Y'),
+                'date': character.posted_at.strftime('%d.%m.%Y'),
+                'time': character.posted_at.strftime('%H:%M:%S'),
                 'full': character.posted_at.strftime('%d.%m.%Y %H:%M:%S')
             }
         }
+
+    @staticmethod
+    def serialize_characters_with_clothes(characters_with_clothes: list) -> list:
+        result = []
+        for obj in characters_with_clothes:
+            character = CharactersSerializer.serialize_one(obj['character'])
+            clothes = ClothesSerializer.serialize(obj['clothes'])
+            character['clothes'] = clothes
+            result.append(character)
+        return result

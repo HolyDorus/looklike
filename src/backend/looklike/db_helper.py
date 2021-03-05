@@ -102,3 +102,14 @@ class DBHelper:
                 query = f'{query} INTERSECT {base_query}'
 
         return query
+
+    @staticmethod
+    def get_character_clothes(character: Character) -> list[Clothes]:
+        with get_db_cursor() as cursor:
+            query = 'select * from all_clothes where id in (select ' + \
+            'clothes_id from clothes_on_characters where character_id = %s)'
+            cursor.execute(query, (character.id,))
+            data = cursor.fetchall()
+
+        clothes = [Clothes(**item) for item in data]
+        return clothes

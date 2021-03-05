@@ -5,7 +5,7 @@ import sys
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY')
     DATABASE_URL = os.getenv('DATABASE_URL')
-    FRONTEND_URL = 'http://localhost:5555'
+    FRONTEND_URL = '*'
     MEDIA_ROOT = '../media/'
     MEDIA_URL = '/media/'
     JSON_SORT_KEYS = False
