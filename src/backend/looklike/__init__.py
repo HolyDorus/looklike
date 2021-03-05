@@ -14,13 +14,19 @@ def create_app(config_class) -> Flask:
     app.register_blueprint(clothes_bp)
     app.register_blueprint(characters_bp)
 
-    if app.config['DEBUG']:
-        media_root = app.config['MEDIA_ROOT']
-        media_url = app.config['MEDIA_URL']
+    if app.config['ENABLE_MEDIA_FILES']:
+        connect_media_folder(app)
+
+    return app
+
+
+def connect_media_folder(app):
+    media_root = app.config['MEDIA_ROOT']
+    media_url = app.config['MEDIA_URL']
+    
+    if media_root and media_url:
         url = f'{media_url}<path:filename>'
 
         @app.route(url, methods=['GET'])
         def get_media(filename: str):
             return send_from_directory(media_root, filename)
-
-    return app

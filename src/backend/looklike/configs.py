@@ -5,10 +5,11 @@ import sys
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY')
     DATABASE_URL = os.getenv('DATABASE_URL')
-    FRONTEND_URL = '*'
+    AVAILABLE_HOSTS = '*'
+    JSON_SORT_KEYS = False
+    ENABLE_MEDIA_FILES = False
     MEDIA_ROOT = '../media/'
     MEDIA_URL = '/media/'
-    JSON_SORT_KEYS = False
 
 
 class DevConfig(BaseConfig):
