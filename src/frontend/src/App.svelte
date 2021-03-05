@@ -1,30 +1,21 @@
 <script>
-	export let name;
+    import { Router, Route } from 'svelte-routing';
+
+    import Index from './routes/Index.svelte';
+    import Search from './routes/Search.svelte';
+    import SearchResult from './routes/SearchResult.svelte';
+    import Oops from './routes/Oops.svelte';
+    import NotFound404 from './routes/NotFound404.svelte';
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+<Router>
+    <Route path='/' component={Index}/>
+    <Route path='/search/' component={Search}/>
+    <Route path='/search-result/' component={SearchResult}/>
 
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+    <!-- Register Oops page -->
+    <Route path='/oops/' component={Oops}/>
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>
+    <!-- Register 404 page route -->
+    <Route component={NotFound404}/>
+</Router>

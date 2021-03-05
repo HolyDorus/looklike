@@ -1,63 +1,189 @@
-html, body {
-	position: relative;
-	width: 100%;
-	height: 100%;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Roboto', sans-serif;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 body {
-	color: #333;
-	margin: 0;
-	padding: 8px;
-	box-sizing: border-box;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: rgb(56, 56, 56);
 }
 
 a {
-	color: rgb(0,100,200);
-	text-decoration: none;
+    text-decoration: none;
+    color: white;
 }
 
-a:hover {
-	text-decoration: underline;
+ul, li {
+    display: block;
+    padding: 0;
+    margin: 0;
 }
 
-a:visited {
-	color: rgb(0,80,160);
+input, button {
+    border: none;
+    outline: none;
+    box-sizing: border-box;
 }
 
-label {
-	display: block;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 10px;
 }
 
-input, button, select, textarea {
-	font-family: inherit;
-	font-size: inherit;
-	-webkit-padding: 0.4em 0;
-	padding: 0.4em;
-	margin: 0 0 0.5em 0;
-	box-sizing: border-box;
-	border: 1px solid #ccc;
-	border-radius: 2px;
+/* ToolTip Start */
+[tooltip]::before,
+[tooltip]::after
+{
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    display: none;
+    opacity: 0;
+    text-transform: none; 
+    font-size: 1rem;
 }
 
-input:disabled {
-	color: #ccc;
+[tooltip]::before
+{
+    content: "";
+    z-index: 1001;
+    border: 5px solid transparent;
 }
 
-button {
-	color: #333;
-	background-color: #f4f4f4;
-	outline: none;
+[tooltip]::after
+{
+    content: attr(tooltip);
+    z-index: 1000;
+    text-align: center;
+    min-width: 3em;
+    max-width: 21em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 1ch 1.5ch;
+    border-radius: .3ch;
+    box-shadow: 0 1em 2em -.5em rgba(0, 0, 0, 0.35);
+    background: #333;
+    color: white;
 }
 
-button:disabled {
-	color: #999;
+[tooltip]:hover::before,
+[tooltip]:hover::after
+{
+    display: block;
 }
 
-button:not(:disabled):active {
-	background-color: #ddd;
+[tooltip='']::before,
+[tooltip='']::after
+{
+    display: none !important;
 }
 
-button:focus {
-	border-color: #666;
+[tooltip]::before
+{
+    top: 100%;
+    border-top-width: 0;
+    border-bottom-color: #333;
 }
+ 
+[tooltip]::after
+{
+    top: calc(100% + 5px);
+}
+ 
+[tooltip]::before,
+[tooltip]::after
+{
+    left: 50%;
+    transform: translate(-50%, .5em);
+}
+
+@keyframes tooltips-vert {
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+   
+  @keyframes tooltips-horz {
+    to {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+  }
+
+[tooltip]:hover::before,
+[tooltip]:hover::after {
+    animation: 
+        tooltips-vert 
+        300ms 
+        ease-out
+        forwards;
+}
+/* ToolTip End*/
+
+
+/* Black button Start */
+.black-button {
+    display: inline-block;
+    color: white;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    padding: 15px 30px;
+    cursor: pointer;
+    border-radius: 7px;
+    background: rgb(59, 59, 59);
+    transition: 0.1s all;
+}
+
+.black-button:hover {
+    background: rgb(45, 45, 45);
+    transition: 0.1s all;
+}
+
+.black-button:active {
+    background: rgb(49, 49, 49);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+/* Black button End */
+
+
+/* Errors block Start */
+.block-status {
+    border-width: 3px;
+    border-style: solid;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 20px 0;
+    font-size: 1.1rem;
+}
+
+.block-status ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.block-status li {
+    display: list-item;
+}
+
+.b-errors {
+    color: rgb(233, 41, 41);
+    background-color: rgb(255, 201, 201);
+    border-color: rgb(252, 152, 152);
+}
+
+.b-success {
+    border-color: rgb(122, 247, 117);
+    background-color: rgb(186, 255, 184);
+    color: rgb(69, 190, 65);
+}
+/* Errors block End */
