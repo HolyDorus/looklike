@@ -7,9 +7,7 @@ class BaseConfig:
     DATABASE_URL = os.getenv('DATABASE_URL')
     AVAILABLE_HOSTS = '*'
     JSON_SORT_KEYS = False
-    ENABLE_MEDIA_FILES = False
-    MEDIA_ROOT = '../media/'
-    MEDIA_URL = '/media/'
+    MEDIA_URL = os.getenv('MEDIA_URL')
 
 
 class DevConfig(BaseConfig):

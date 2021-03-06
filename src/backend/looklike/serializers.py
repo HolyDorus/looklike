@@ -14,9 +14,7 @@ class ClothesSerializer():
 
     @staticmethod
     def serialize_one(clothes: Clothes) -> dict:
-        base_url = 'http://127.0.0.1:5000'
-        media_url = config.MEDIA_URL
-        image_url = f'{base_url}{media_url}{clothes.image_path}'
+        image_url = f'{config.MEDIA_URL}{clothes.image_path}'
 
         return {
             'id': clothes.id,
@@ -58,9 +56,7 @@ class CharactersSerializer():
 
     @staticmethod
     def serialize_one(character: Character) -> dict:
-        base_url = 'http://127.0.0.1:5000'
-        media_url = config.MEDIA_URL
-        image_url = f'{base_url}{media_url}{character.image_path}'
+        image_url = f'{config.MEDIA_URL}{character.image_path}'
         
         return {
             'id': character.id,
