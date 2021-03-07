@@ -7,8 +7,8 @@ authors = ["HolyDorus <marichevdenysmail@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 Flask = "^1.1.2"
-psycopg2 = "^2.8.6"
 gunicorn = "^20.0.4"
+psycopg2-binary = "^2.8.6"
 
 [tool.poetry.dev-dependencies]
 

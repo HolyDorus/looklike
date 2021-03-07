@@ -7,3 +7,5 @@ media/
 
 *.py[cod]
 *.log
+
+.env
