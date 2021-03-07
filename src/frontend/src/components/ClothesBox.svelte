@@ -1,4 +1,7 @@
 <script>
+    import { apiUrl } from '../settings';
+
+
     export let clothes = [];
 
     function clothesItemClickHandler(event) {
@@ -121,9 +124,12 @@
     }
 
     async function loadClothesChildren(parent_id) {
-        const url = `http://127.0.0.1:5000/api/v1/clothes/?parent_id=${parent_id}`;
+        const url = `${apiUrl}/api/v1/clothes/?parent_id=${parent_id}`;
         const response = await fetch(url, {
-            method: 'GET'
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
         if (!response.ok) {

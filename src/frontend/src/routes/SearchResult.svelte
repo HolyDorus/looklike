@@ -6,8 +6,10 @@
     import CharactersCard from '../components/CharactersCard.svelte';
     import Header from './../components/Header.svelte';
 
-    import { getAllUrlParams } from '../utils.js';
+    import { apiUrl } from '../settings';
+    import { getAllUrlGetParams } from '../utils.js';
 
+    
     function whooshAnimation(node, params) {
 		const existingTransform = getComputedStyle(node).transform.replace('none', '');
 
@@ -22,50 +24,42 @@
     let error;
     let searchResult = [];
 
-    onMount(() => {
+    onMount(async () => {
         const urlPart = formatUrlPart(window.location.href);
+        const result = await loadSearchResult(urlPart);
 
-        loadSearchResult(urlPart)
-            .then(function(result) {
+        if (result && Array.isArray(result)){
+            if (!result.length) {
+                error = 'На жаль, образів з такими речами не знайдено';
+            } else {
                 searchResult = result;
-
-                if (Array.isArray(searchResult) && !searchResult.length) {
-                    error = 'На жаль, образів з такими речами не знайдено';
-                }
-            });
+            }
+        }
     });
 
     function formatUrlPart(url) {
-        const getParams = getAllUrlParams(url);
-        const clothesIdsList = getParams.clothes;
+        const allUrlGetParams = getAllUrlGetParams(url);
+        const clothesIds = allUrlGetParams.clothes[0];
         let ouputString = '?clothes=';
 
-        if (!clothesIdsList) return undefined;
+        if (!clothesIds) return ouputString;
 
-        if (typeof clothesIdsList === 'string') {
-            return ouputString + clothesIdsList;
-        } else if (Array.isArray(clothesIdsList)) {
-            for (let i = 0; i < clothesIdsList.length; i++) {
-                ouputString += clothesIdsList[i];
-                if (i !== clothesIdsList.length - 1) ouputString += ','
-            }
-        } else {
-            return undefined;
-        }
-
-        return ouputString;
+        return ouputString + clothesIds;
     }
 
     async function loadSearchResult(urlPart) {
-        const response = await fetch(`http://127.0.0.1:5000/api/v1/characters${urlPart}`, {
-            method: 'GET'
+        const response = await fetch(`${apiUrl}/api/v1/characters${urlPart}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
         let responseData = await response.json();
 
         if (!response.ok) {
             if (responseData.message === 'One or more Clothes from the list were not found!') {
-                error = 'Один або декілька одягів зі списку не знайдено';
+                error = 'Не знайдено один або декілька елементів одягу зі списку';
             } else {
                 navigate('/oops');
             }

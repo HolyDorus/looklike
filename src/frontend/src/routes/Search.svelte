@@ -6,6 +6,8 @@
     import Header from './../components/Header.svelte';
     import ClothesBox from './../components/ClothesBox.svelte';
 
+    import { apiUrl } from '../settings';
+
     
     function whooshAnimation(node, params) {
 		const existingTransform = getComputedStyle(node).transform.replace('none', '');
@@ -21,12 +23,9 @@
     let clothesList = [];
     let error;
 
-    onMount(() => {
-        loadPrimaryClothes()
-            .then(function(result) {
-                clothesList = result;
-                console.log(result);
-            });
+    onMount(async () => {
+        const result = await loadPrimaryClothes();
+        clothesList = result;
     });
 
     function searchButtonClickHandler(event) {
@@ -56,22 +55,23 @@
     }
 
     function formatSelectedItemIds(allSelectedItemIds) {
-        let str = '';
+        let str = 'clothes[]=';
 
         for (let i = 0; i < allSelectedItemIds.length; i++) {
-            str += `clothes[]=${allSelectedItemIds[i]}`;
-            if (i !== allSelectedItemIds.length - 1) str += '&';
+            str += allSelectedItemIds[i];
+            if (i !== allSelectedItemIds.length - 1) str += ',';
         }
 
         return str;
     }
 
     async function loadPrimaryClothes() {
-        console.log('Начлся запрос');
-        const response = await fetch('http://127.0.0.1:5000/api/v1/clothes/?primary_only', {
-            method: 'GET'
+        const response = await fetch(`${apiUrl}/api/v1/clothes/?primary_only`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
-        console.log('Конец запроса');
         return await response.json();
     };
 </script>
