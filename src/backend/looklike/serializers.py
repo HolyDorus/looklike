@@ -43,7 +43,7 @@ class ClothesSerializer():
     @staticmethod
     def _get_children(clothes: Clothes, clothing_list: list[Clothes]) -> list[Clothes]:
         children = [cl for cl in clothing_list if cl.parent_id == clothes.id]
-        return children        
+        return children
 
 
 class CharactersSerializer():
@@ -57,7 +57,7 @@ class CharactersSerializer():
     @staticmethod
     def serialize_one(character: Character) -> dict:
         image_url = f'{config.MEDIA_URL}{character.image_path}'
-        
+
         return {
             'id': character.id,
             'author_id': character.author_id,

@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 
 from looklike.blueprints.clothes_routes import clothes_bp
 from looklike.blueprints.characters_routes import characters_bp

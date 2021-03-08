@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 
 from looklike.db_helper import DBHelper
 from looklike.serializers import ClothesSerializer
-from looklike.models import Clothes
 
 
 url_prefix = '/api/v1/clothes/'
