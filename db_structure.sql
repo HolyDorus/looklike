@@ -1,7 +1,7 @@
 CREATE EXTENSION ltree;
 
 CREATE TABLE all_clothes (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT,
     image_path VARCHAR(250),
     parent_id INTEGER REFERENCES all_clothes ON DELETE CASCADE,
@@ -9,7 +9,7 @@ CREATE TABLE all_clothes (
 );
 
 CREATE TABLE characters (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     author_id INTEGER,
     image_path VARCHAR(250),
     description TEXT,
@@ -17,7 +17,7 @@ CREATE TABLE characters (
 );
 
 CREATE TABLE clothes_on_characters (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     character_id INTEGER REFERENCES characters ON DELETE CASCADE,
     clothes_id INTEGER REFERENCES all_clothes ON DELETE CASCADE
 );

@@ -1,1 +1,1 @@
-export const apiUrl = 'http://c03107505beb.ngrok.io'; // Default 'http://localhost:80'
+export const apiUrl = 'http://localhost:90'; // Default 'http://localhost:90'
