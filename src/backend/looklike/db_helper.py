@@ -6,10 +6,10 @@ from looklike.models import Clothes, Character
 class DBHelper:
     @staticmethod
     def get_all_clothes() -> list[Clothes]:
-        with get_db_cursor() as cursor: 
-            cursor.execute('SELECT * FROM all_clothes;') 
+        with get_db_cursor() as cursor:
+            cursor.execute('SELECT * FROM all_clothes;')
             data = cursor.fetchall()
-        
+
         all_clothes = [Clothes(**item) for item in data]
         return all_clothes
 
@@ -17,11 +17,10 @@ class DBHelper:
     def get_clothes_by_parent_id(parent_id: int) -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM all_clothes WHERE ' + \
-                'parent_id = %s;', (parent_id,)
-            ) 
+                'SELECT * FROM all_clothes WHERE parent_id = %s;', (parent_id,)
+            )
             data = cursor.fetchall()
-        
+
         clothes_by_parent = [Clothes(**item) for item in data]
         return clothes_by_parent
 
@@ -30,27 +29,39 @@ class DBHelper:
         with get_db_cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM all_clothes WHERE parent_path ~ \'*{,2}\';'
-            ) 
+            )
             data = cursor.fetchall()
-        
+
         primary_clothes = [Clothes(**item) for item in data]
         return primary_clothes
 
     @staticmethod
     def get_all_characters() -> list[Character]:
-        with get_db_cursor() as cursor: 
-            cursor.execute('SELECT * FROM characters;') 
+        with get_db_cursor() as cursor:
+            cursor.execute('SELECT * FROM characters;')
             data = cursor.fetchall()
-            
+
         all_characters = [Character(**item) for item in data]
         return all_characters
+
+    @staticmethod
+    def get_newess_characters(limit: int = 10) -> list[Character]:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                'SELECT * FROM characters ORDER BY posted_at DESC LIMIT %s;',
+                (limit,)
+            )
+            data = cursor.fetchall()
+
+        newess_characters = [Character(**item) for item in data]
+        return newess_characters
 
     @staticmethod
     def get_character_by_id(character_id: int) -> Character:
         with get_db_cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM characters WHERE id = %s;', (character_id,)
-            ) 
+            )
             data = cursor.fetchone()
 
         if not data:
@@ -68,13 +79,13 @@ class DBHelper:
 
             if not parent_paths:
                 raise ObjectNotFoundException(
-                    f'One or more Clothes from the list were not found!'
+                    'One or more Clothes from the list were not found!'
                 )
 
             query = DBHelper._format_specific_query(parent_paths)
             cursor.execute(query, parent_paths)
             data = cursor.fetchall()
-        
+
         characters = [Character(**item) for item in data]
         return characters
 
@@ -84,7 +95,7 @@ class DBHelper:
             query = 'SELECT parent_path FROM all_clothes WHERE id = any(%s)'
             cursor.execute(query, (clothes_ids,))
             data = cursor.fetchall()
-        
+
         parent_paths = [item['parent_path'] for item in data]
         return parent_paths
 

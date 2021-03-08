@@ -29,6 +29,24 @@ def get_characters():
 
         return jsonify(CharactersSerializer.serialize(character))
 
+    # URL example:  /api/v1/characters?filter=newness&limit=10
+    filter_type = request.args.get('filter')
+    filter_limit = request.args.get('limit')
+
+    if filter_type == 'newess':
+        if filter_limit:
+            try:
+                filter_limit = int(filter_limit)
+            except ValueError:
+                return jsonify(
+                    {'message': 'Argument \'filter_limit\' must be integer!'}
+                ), 400
+            filtered_characters = DBHelper.get_newess_characters(filter_limit)
+        else:
+            filtered_characters = DBHelper.get_newess_characters()
+
+        return jsonify(CharactersSerializer.serialize(filtered_characters))
+
     # URL example:  /api/v1/characters?clothes=[2,9]
     clothes_list = request.args.get('clothes')
     if clothes_list:
@@ -36,7 +54,7 @@ def get_characters():
             clothes_ids = get_ids_from_string(clothes_list)
         except ValueError:
             return jsonify({
-                'message': 
+                'message':
                     'Argument \'clothes\' must be array of integers!'
             }), 400
 
@@ -52,7 +70,7 @@ def get_characters():
                 })
         except ObjectNotFoundException as e:
             return jsonify({'message': str(e)}), 404
-            
+
         return jsonify(
             CharactersSerializer.serialize_characters_with_clothes(
                 characters_with_their_clothes
