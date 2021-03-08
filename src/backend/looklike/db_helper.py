@@ -90,10 +90,11 @@ class DBHelper:
 
     @staticmethod
     def _format_specific_query(parent_paths: list[str]) -> str:
-        base_query = 'SELECT * FROM characters WHERE id IN ' + \
-        '(SELECT character_id FROM clothes_on_characters WHERE ' + \
-        'clothes_id IN (SELECT id FROM all_clothes WHERE ' + \
-        'parent_path <@ %s))'
+        base_query = (
+            'SELECT * FROM characters WHERE id IN (SELECT character_id FROM '
+            'clothes_on_characters WHERE clothes_id IN (SELECT id FROM '
+            'all_clothes WHERE parent_path <@ %s))'
+        )
 
         for i, _ in enumerate(parent_paths):
             if i == 0:
@@ -106,8 +107,10 @@ class DBHelper:
     @staticmethod
     def get_character_clothes(character: Character) -> list[Clothes]:
         with get_db_cursor() as cursor:
-            query = 'select * from all_clothes where id in (select ' + \
-            'clothes_id from clothes_on_characters where character_id = %s)'
+            query = (
+                'select * from all_clothes where id in (select clothes_id '
+                'from clothes_on_characters where character_id = %s)'
+            )
             cursor.execute(query, (character.id,))
             data = cursor.fetchall()
 
