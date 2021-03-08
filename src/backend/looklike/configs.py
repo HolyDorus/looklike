@@ -1,6 +1,12 @@
 import os
 import sys
 
+from dotenv import load_dotenv
+
+
+# Load all values from .env file
+load_dotenv()
+
 
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY')
