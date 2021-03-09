@@ -1,1 +1,1 @@
-export const apiUrl = 'http://localhost:90'; // Default 'http://localhost:90'
+export const apiUrl = '/api/v1'; // Default '/api/v1'

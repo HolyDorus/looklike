@@ -124,7 +124,7 @@
     }
 
     async function loadClothesChildren(parent_id) {
-        const url = `${apiUrl}/api/v1/clothes/?parent_id=${parent_id}`;
+        const url = `${apiUrl}/clothes/?parent_id=${parent_id}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {

@@ -48,7 +48,7 @@
     }
 
     async function loadSearchResult(urlPart) {
-        const response = await fetch(`${apiUrl}/api/v1/characters${urlPart}`, {
+        const response = await fetch(`${apiUrl}/characters${urlPart}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
