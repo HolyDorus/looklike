@@ -1,8 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, json as flask_json
 
+from looklike.configs import config
 from looklike.db_helper import DBHelper
 from looklike.exceptions import ObjectNotFoundException
 from looklike.serializers import CharactersWithClothesSerializer
+from looklike.redis_client import redis_client, format_cache_key
 from looklike.utils import get_ids_from_string
 
 
@@ -70,6 +72,12 @@ def get_characters():
             }), 400
 
         try:
+            cache_key = format_cache_key(clothes_ids)
+            cache_value = redis_client.get(cache_key)
+            if cache_value:
+                response_text = cache_value.decode('utf-8')
+                return response_text, 200, {'Content-Type': 'application/json'}
+
             characters = DBHelper.get_characters_by_clothes(
                 clothes_ids=clothes_ids,
                 with_clothes=True
@@ -77,7 +85,16 @@ def get_characters():
         except ObjectNotFoundException as e:
             return jsonify({'message': str(e)}), 404
 
-        return jsonify(CharactersWithClothesSerializer.serialize(characters))
+        serialized = CharactersWithClothesSerializer.serialize(characters)
+
+        new_cache_value = flask_json.dumps(serialized)
+        redis_client.set(
+            name=cache_key,
+            value=new_cache_value,
+            ex=config.REDIS_CACHE_EXPIRE
+        )
+
+        return jsonify(serialized)
 
     # URL example:  /api/v1/characters
     all_characters = DBHelper.get_all_characters(with_clothes=True)

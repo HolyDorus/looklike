@@ -10,7 +10,9 @@ load_dotenv()
 
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY')
-    DATABASE_URL = os.getenv('DATABASE_URL')
+    POSTGRESQL_URL = os.getenv('POSTGRESQL_URL')
+    REDIS_URL = os.getenv('REDIS_URL')
+    REDIS_CACHE_EXPIRE = 10 * 60
     AVAILABLE_HOSTS = '*'
     JSON_SORT_KEYS = False
     MEDIA_URL = os.getenv('MEDIA_URL')

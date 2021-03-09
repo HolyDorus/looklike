@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 from looklike.configs import config
 
 
-url = urlparse(config.DATABASE_URL)
+url = urlparse(config.POSTGRESQL_URL)
 
 connection_pool = ThreadedConnectionPool(
     minconn=1,
