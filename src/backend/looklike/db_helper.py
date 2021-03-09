@@ -7,7 +7,10 @@ class DBHelper:
     @staticmethod
     def get_all_clothes() -> list[Clothes]:
         with get_db_cursor() as cursor:
-            cursor.execute('SELECT * FROM all_clothes;')
+            cursor.execute(
+                ('SELECT id, name, image_path, parent_id, parent_path FROM '
+                 'all_clothes;')
+            )
             data = cursor.fetchall()
 
         all_clothes = [Clothes(**item) for item in data]
@@ -17,7 +20,9 @@ class DBHelper:
     def get_clothes_by_parent_id(parent_id: int) -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM all_clothes WHERE parent_id = %s;', (parent_id,)
+                ('SELECT id, name, image_path, parent_id, parent_path FROM '
+                 'all_clothes WHERE parent_id = %s;'),
+                (parent_id,)
             )
             data = cursor.fetchall()
 
@@ -28,7 +33,8 @@ class DBHelper:
     def get_primary_clothes() -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM all_clothes WHERE parent_path ~ \'*{,2}\';'
+                ('SELECT id, name, image_path, parent_id, parent_path FROM '
+                 'all_clothes WHERE parent_path ~ \'*{,2}\';')
             )
             data = cursor.fetchall()
 
@@ -38,7 +44,10 @@ class DBHelper:
     @staticmethod
     def get_all_characters(with_clothes: bool = False) -> list[Character]:
         with get_db_cursor() as cursor:
-            cursor.execute('SELECT * FROM characters;')
+            cursor.execute(
+                ('SELECT id, author_id, image_path, description, posted_at '
+                 'FROM characters;')
+            )
             data = cursor.fetchall()
 
         all_characters = [Character(**item) for item in data]
@@ -55,7 +64,8 @@ class DBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM characters ORDER BY posted_at DESC LIMIT %s;',
+                ('SELECT id, author_id, image_path, description, posted_at '
+                 'FROM characters ORDER BY posted_at DESC LIMIT %s;'),
                 (limit,)
             )
             data = cursor.fetchall()
@@ -74,7 +84,9 @@ class DBHelper:
     ) -> Character:
         with get_db_cursor() as cursor:
             cursor.execute(
-                'SELECT * FROM characters WHERE id = %s;', (character_id,)
+                ('SELECT id, author_id, image_path, description, posted_at '
+                 'FROM characters WHERE id = %s;'),
+                (character_id,)
             )
             data = cursor.fetchone()
 
@@ -127,7 +139,8 @@ class DBHelper:
     @staticmethod
     def _format_specific_query(parent_paths: list[str]) -> str:
         base_query = (
-            'SELECT * FROM characters WHERE id IN (SELECT character_id FROM '
+            'SELECT id, author_id, image_path, description, posted_at FROM '
+            'characters WHERE id IN (SELECT character_id FROM '
             'clothes_on_characters WHERE clothes_id IN (SELECT id FROM '
             'all_clothes WHERE parent_path <@ %s))'
         )
@@ -149,8 +162,9 @@ class DBHelper:
     def _get_character_clothes(character: Character) -> list[Clothes]:
         with get_db_cursor() as cursor:
             query = (
-                'select * from all_clothes where id in (select clothes_id '
-                'from clothes_on_characters where character_id = %s)'
+                'SELECT id, name, image_path, parent_id, parent_path FROM '
+                'all_clothes WHERE id in (SELECT clothes_id FROM '
+                'clothes_on_characters WHERE character_id = %s)'
             )
             cursor.execute(query, (character.id,))
             data = cursor.fetchall()

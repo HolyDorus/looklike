@@ -1,14 +1,14 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import NamedTuple, Optional
 
 
-class Clothes(NamedTuple):
-    id: Optional[int]
-    name: Optional[str]
-    image_path: Optional[str]
-    parent_id: Optional[int]
-    parent_path: Optional[str]
+@dataclass
+class Clothes:
+    id: int
+    name: str
+    image_path: str
+    parent_id: int
+    parent_path: str
 
     def __str__(self):
         return f'<Clothes id={self.id} Name={self.name}>'
@@ -19,17 +19,12 @@ class Clothes(NamedTuple):
 
 @dataclass
 class Character:
-    id: Optional[int]
-    author_id: Optional[int]
-    image_path: Optional[str]
-    description: Optional[str]
-    posted_at: Optional[datetime]
-    clothes: Optional[list]
-
-    def __init__(self, *args, **kwargs):
-        self.clothes = []
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+    id: int
+    author_id: int
+    image_path: str
+    description: str
+    posted_at: datetime
+    clothes: list = field(default_factory=list)
 
     def __str__(self):
         return f'<Character id={self.id} Description={self.description}>'
