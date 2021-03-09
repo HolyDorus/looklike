@@ -71,13 +71,14 @@
 
 <Header/>
 <div class="container">
-    <div class="characters-grid">
-        {#if searchResult.length}
+    {#if searchResult.length}
+        <h1>Знайдені образи</h1>
+        <div class="characters-grid">
             {#each searchResult as character}
                 <CharactersCard character={character}/>
-            {/each}            
-        {/if}
-    </div>
+            {/each}
+        </div>
+    {/if}
 
     {#if error}
         <div transition:whooshAnimation class="block-status b-errors">
@@ -94,6 +95,12 @@
 </div>
 
 <style>
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+        color: #383838;
+    }
+
     .characters-grid {
         display: grid;
         grid-template-columns: repeat(3, 32%);

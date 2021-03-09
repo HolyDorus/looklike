@@ -5,15 +5,15 @@ from looklike.models import Clothes, Character
 
 
 class ClothesSerializer():
-    @staticmethod
-    def serialize(clothes) -> Union[dict, list]:
+    @classmethod
+    def serialize(cls, clothes) -> Union[dict, list]:
         if isinstance(clothes, list) or isinstance(clothes, tuple):
-            return [ClothesSerializer.serialize_one(cl) for cl in clothes]
+            return [cls.serialize_one(cl) for cl in clothes]
         else:
-            return ClothesSerializer.serialize_one(clothes)
+            return cls.serialize_one(clothes)
 
-    @staticmethod
-    def serialize_one(clothes: Clothes) -> dict:
+    @classmethod
+    def serialize_one(cls, clothes: Clothes) -> dict:
         image_url = f'{config.MEDIA_URL}{clothes.image_path}'
 
         return {
@@ -23,39 +23,50 @@ class ClothesSerializer():
             'parent_id': clothes.parent_id
         }
 
-    @staticmethod
-    def serialize_primary_only(primary_clothes: list[Clothes]) -> list[dict]:
+    @classmethod
+    def serialize_primary_only(
+        cls,
+        primary_clothes: list[Clothes]
+    ) -> list[dict]:
         result = []
         for clothes in primary_clothes:
             if clothes.parent_id:
                 continue
 
-            serialized = ClothesSerializer.serialize_one(clothes)
-            children = ClothesSerializer._get_children(clothes, primary_clothes)
+            serialized = cls.serialize_one(clothes)
+            children = cls._get_children(clothes, primary_clothes)
 
             serialized['children'] = [
-                ClothesSerializer.serialize_one(child) for child in children
+                cls.serialize_one(child) for child in children
             ]
 
             result.append(serialized)
+
         return result
 
-    @staticmethod
-    def _get_children(clothes: Clothes, clothing_list: list[Clothes]) -> list[Clothes]:
-        children = [cl for cl in clothing_list if cl.parent_id == clothes.id]
+    @classmethod
+    def _get_children(
+        cls,
+        clothes: Clothes,
+        clothing_list: list[Clothes]
+    ) -> list[Clothes]:
+        children = list(
+            filter(lambda x: x.parent_id == clothes.id, clothing_list)
+        )
+
         return children
 
 
 class CharactersSerializer():
-    @staticmethod
-    def serialize(character) -> Union[dict, list]:
-        if isinstance(character, list) or isinstance(character, tuple):
-            return [CharactersSerializer.serialize_one(cl) for cl in character]
+    @classmethod
+    def serialize(cls, characters) -> Union[dict, list]:
+        if isinstance(characters, list) or isinstance(characters, tuple):
+            return [cls.serialize_one(character) for character in characters]
         else:
-            return CharactersSerializer.serialize_one(character)
+            return cls.serialize_one(characters)
 
-    @staticmethod
-    def serialize_one(character: Character) -> dict:
+    @classmethod
+    def serialize_one(cls, character: Character) -> dict:
         image_url = f'{config.MEDIA_URL}{character.image_path}'
 
         return {
@@ -70,12 +81,22 @@ class CharactersSerializer():
             }
         }
 
-    @staticmethod
-    def serialize_characters_with_clothes(characters_with_clothes: list) -> list:
-        result = []
-        for obj in characters_with_clothes:
-            character = CharactersSerializer.serialize_one(obj['character'])
-            clothes = ClothesSerializer.serialize(obj['clothes'])
-            character['clothes'] = clothes
-            result.append(character)
-        return result
+
+class CharactersWithClothesSerializer():
+    @classmethod
+    def serialize_one(cls, character: Character) -> dict:
+        serialized_character = CharactersSerializer.serialize_one(character)
+        serialized_clothes = ClothesSerializer.serialize(character.clothes)
+        serialized_character['clothes'] = serialized_clothes
+
+        return serialized_character
+
+    @classmethod
+    def serialize(cls, characters) -> Union[dict, list]:
+        if (isinstance(characters, list) or
+                isinstance(characters, tuple)):
+            return [
+                cls.serialize_one(character) for character in characters
+            ]
+        else:
+            return cls.serialize_one(characters)

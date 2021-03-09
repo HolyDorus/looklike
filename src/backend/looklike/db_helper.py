@@ -36,16 +36,23 @@ class DBHelper:
         return primary_clothes
 
     @staticmethod
-    def get_all_characters() -> list[Character]:
+    def get_all_characters(with_clothes: bool = False) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute('SELECT * FROM characters;')
             data = cursor.fetchall()
 
         all_characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            DBHelper._inject_clothes_to_characters(all_characters)
+
         return all_characters
 
     @staticmethod
-    def get_newess_characters(limit: int = 10) -> list[Character]:
+    def get_newest_characters(
+        limit: int = 10,
+        with_clothes: bool = False
+    ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM characters ORDER BY posted_at DESC LIMIT %s;',
@@ -53,11 +60,18 @@ class DBHelper:
             )
             data = cursor.fetchall()
 
-        newess_characters = [Character(**item) for item in data]
-        return newess_characters
+        newest_characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            DBHelper._inject_clothes_to_characters(newest_characters)
+
+        return newest_characters
 
     @staticmethod
-    def get_character_by_id(character_id: int) -> Character:
+    def get_character_by_id(
+        character_id: int,
+        with_clothes: bool = False
+    ) -> Character:
         with get_db_cursor() as cursor:
             cursor.execute(
                 'SELECT * FROM characters WHERE id = %s;', (character_id,)
@@ -70,10 +84,17 @@ class DBHelper:
             )
 
         character = Character(**data)
+
+        if with_clothes:
+            DBHelper._inject_clothes_to_characters([character])
+
         return character
 
     @staticmethod
-    def get_characters_by_clothes(clothes_ids: list[int]) -> list[Character]:
+    def get_characters_by_clothes(
+        clothes_ids: list[int],
+        with_clothes: bool = False
+    ) -> list[Character]:
         with get_db_cursor() as cursor:
             parent_paths = DBHelper._get_clothes_parent_paths(clothes_ids)
 
@@ -87,6 +108,10 @@ class DBHelper:
             data = cursor.fetchall()
 
         characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            DBHelper._inject_clothes_to_characters(characters)
+
         return characters
 
     @staticmethod
@@ -116,7 +141,12 @@ class DBHelper:
         return query
 
     @staticmethod
-    def get_character_clothes(character: Character) -> list[Clothes]:
+    def _inject_clothes_to_characters(characters: list[Character]):
+        for character in characters:
+            character.clothes = DBHelper._get_character_clothes(character)
+
+    @staticmethod
+    def _get_character_clothes(character: Character) -> list[Clothes]:
         with get_db_cursor() as cursor:
             query = (
                 'select * from all_clothes where id in (select clothes_id '

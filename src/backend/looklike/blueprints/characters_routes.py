@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 
 from looklike.db_helper import DBHelper
 from looklike.exceptions import ObjectNotFoundException
-from looklike.serializers import CharactersSerializer
+from looklike.serializers import CharactersWithClothesSerializer
 from looklike.utils import get_ids_from_string
 
 
@@ -23,17 +23,20 @@ def get_characters():
             ), 400
 
         try:
-            character = DBHelper.get_character_by_id(character_id)
+            character = DBHelper.get_character_by_id(
+                character_id,
+                with_clothes=True
+                )
         except ObjectNotFoundException as e:
             return jsonify({'message': str(e)}), 404
 
-        return jsonify(CharactersSerializer.serialize(character))
+        return jsonify(CharactersWithClothesSerializer.serialize(character))
 
     # URL example:  /api/v1/characters?filter=newness&limit=10
     filter_type = request.args.get('filter')
     filter_limit = request.args.get('limit')
 
-    if filter_type == 'newess':
+    if filter_type == 'newness':
         if filter_limit:
             try:
                 filter_limit = int(filter_limit)
@@ -41,11 +44,19 @@ def get_characters():
                 return jsonify(
                     {'message': 'Argument \'filter_limit\' must be integer!'}
                 ), 400
-            filtered_characters = DBHelper.get_newess_characters(filter_limit)
-        else:
-            filtered_characters = DBHelper.get_newess_characters()
 
-        return jsonify(CharactersSerializer.serialize(filtered_characters))
+            filtered_characters = DBHelper.get_newest_characters(
+                limit=filter_limit,
+                with_clothes=True
+            )
+        else:
+            filtered_characters = DBHelper.get_newest_characters(
+                with_clothes=True
+            )
+
+        return jsonify(
+            CharactersWithClothesSerializer.serialize(filtered_characters)
+        )
 
     # URL example:  /api/v1/characters?clothes=[2,9]
     clothes_list = request.args.get('clothes')
@@ -59,24 +70,15 @@ def get_characters():
             }), 400
 
         try:
-            characters_with_their_clothes = []
-            characters = DBHelper.get_characters_by_clothes(clothes_ids)
-
-            for character in characters:
-                clothes = DBHelper.get_character_clothes(character)
-                characters_with_their_clothes.append({
-                    'character': character,
-                    'clothes': clothes
-                })
+            characters = DBHelper.get_characters_by_clothes(
+                clothes_ids=clothes_ids,
+                with_clothes=True
+            )
         except ObjectNotFoundException as e:
             return jsonify({'message': str(e)}), 404
 
-        return jsonify(
-            CharactersSerializer.serialize_characters_with_clothes(
-                characters_with_their_clothes
-            )
-        )
+        return jsonify(CharactersWithClothesSerializer.serialize(characters))
 
     # URL example:  /api/v1/characters
-    all_characters = DBHelper.get_all_characters()
-    return jsonify(CharactersSerializer.serialize(all_characters))
+    all_characters = DBHelper.get_all_characters(with_clothes=True)
+    return jsonify(CharactersWithClothesSerializer.serialize(all_characters))

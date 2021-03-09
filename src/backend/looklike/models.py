@@ -1,19 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import NamedTuple, Optional
 
 
-@dataclass
-class Clothes:
+class Clothes(NamedTuple):
     id: Optional[int]
     name: Optional[str]
     image_path: Optional[str]
     parent_id: Optional[int]
     parent_path: Optional[str]
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     def __str__(self):
         return f'<Clothes id={self.id} Name={self.name}>'
@@ -29,8 +24,10 @@ class Character:
     image_path: Optional[str]
     description: Optional[str]
     posted_at: Optional[datetime]
+    clothes: Optional[list]
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.clothes = []
         for k, v in kwargs.items():
             setattr(self, k, v)
 

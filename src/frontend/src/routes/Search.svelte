@@ -82,6 +82,7 @@
 
 <Header/>
 <div class="container">
+    <h1>Оберіть вподобаний одяг</h1>
     {#each clothesList as clothes}
         <ClothesBox clothes={clothes}/>
     {/each}
@@ -101,6 +102,12 @@
 </div>
 
 <style>
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+        color: #383838;
+    }
+
     .black-button-wrapper {
         display: flex;
         justify-content: center;
