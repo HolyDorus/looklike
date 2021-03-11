@@ -5,7 +5,8 @@ CREATE TABLE all_clothes (
     name TEXT,
     image_path VARCHAR(250),
     parent_id INTEGER REFERENCES all_clothes ON DELETE CASCADE,
-    parent_path LTREE
+    parent_path LTREE,
+    display_priority INTEGER
 );
 
 CREATE TABLE characters (

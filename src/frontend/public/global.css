@@ -187,3 +187,64 @@ input, button {
     color: rgb(69, 190, 65);
 }
 /* Errors block End */
+
+
+/* Login/Register card Start */
+.lr-card {
+    margin: 100px auto 0 auto;
+    background-color: inherit;
+    max-width: 450px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.lr-card-title {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 25px;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.lr-card-additionally {
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 20px;
+}
+
+.lr-card-button {
+    width: 100%;
+    font-size: 1.3rem;
+    padding: 10px 0;
+}
+
+.lr-card-link {
+    text-decoration: underline;
+    color: rgb(5, 105, 220);
+}
+
+.lr-card-main label {
+    display: block;
+}
+
+.lr-card-form-container {
+    padding: 0 10%;
+}
+
+.lr-card-fields-wrapper {
+    padding-bottom: 10px;
+}
+
+.lr-card-fields-wrapper input {
+    width: 100%;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    margin-top: 7px;
+    padding: 5px 10px;
+    color: #383838;
+    outline: rgb(161, 161, 161) solid 1px;
+}
+
+.lr-card-fields-wrapper input:focus {
+    outline: rgb(102, 102, 102) solid 2px;
+}
+/* Login/Register card End */

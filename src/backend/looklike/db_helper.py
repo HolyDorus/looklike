@@ -21,7 +21,8 @@ class DBHelper:
         with get_db_cursor() as cursor:
             cursor.execute(
                 ('SELECT id, name, image_path, parent_id, parent_path FROM '
-                 'all_clothes WHERE parent_id = %s;'),
+                 'all_clothes WHERE parent_id = %s ORDER BY '
+                 'display_priority;'),
                 (parent_id,)
             )
             data = cursor.fetchall()
@@ -34,7 +35,8 @@ class DBHelper:
         with get_db_cursor() as cursor:
             cursor.execute(
                 ('SELECT id, name, image_path, parent_id, parent_path FROM '
-                 'all_clothes WHERE parent_path ~ \'*{,2}\';')
+                 'all_clothes WHERE parent_path ~ \'*{,2}\' ORDER BY '
+                 'display_priority;')
             )
             data = cursor.fetchall()
 
@@ -164,7 +166,8 @@ class DBHelper:
             query = (
                 'SELECT id, name, image_path, parent_id, parent_path FROM '
                 'all_clothes WHERE id in (SELECT clothes_id FROM '
-                'clothes_on_characters WHERE character_id = %s)'
+                'clothes_on_characters WHERE character_id = %s) ORDER BY '
+                'display_priority'
             )
             cursor.execute(query, (character.id,))
             data = cursor.fetchall()

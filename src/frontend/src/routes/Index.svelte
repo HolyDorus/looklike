@@ -11,7 +11,6 @@
 
     onMount(async () => {
         const result = await loadNewessCharacters();
-        console.log(result);
         newessCharacters = result;
     });
 
@@ -40,6 +39,14 @@
 <Header/>
 <div class="container">
     <h1>Найновіші образи</h1>
+    <div class="characters-grid">
+        {#if newessCharacters.length}
+            {#each newessCharacters as character}
+                <CharactersCard character={character}/>
+            {/each}     
+        {/if}
+    </div>
+    <h1>Найпопулярніші образи</h1>
     <div class="characters-grid">
         {#if newessCharacters.length}
             {#each newessCharacters as character}

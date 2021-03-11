@@ -214,7 +214,7 @@
         text-align: center;
         font-size: 0.8rem;
         margin-top: 5px;
-        padding: 10px 0;
+        padding: 10px 8px;
         transition: 0.3s all;
         line-height: 0.9rem;
     }
