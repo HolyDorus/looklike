@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from looklike.db_helper import DBHelper
+from looklike.db_helper import ClothesDBHelper
 from looklike.serializers import ClothesSerializer
 
 
@@ -12,7 +12,7 @@ clothes_bp = Blueprint('clothes_bp', __name__, url_prefix=url_prefix)
 def get_clothes():
     # URL example:  /api/v1/clothes?primary_only
     if 'primary_only' in request.args:
-        primary_clothes = DBHelper.get_primary_clothes()
+        primary_clothes = ClothesDBHelper.get_primary_clothes()
         result = ClothesSerializer.serialize_primary_only(primary_clothes)
         return jsonify(result)
 
@@ -26,9 +26,9 @@ def get_clothes():
                 {'message': 'Argument \'parent_id\' must be integer!'}
             ), 400
 
-        clothes_by_parent = DBHelper.get_clothes_by_parent_id(parent_id)
+        clothes_by_parent = ClothesDBHelper.get_clothes_by_parent_id(parent_id)
         return jsonify(ClothesSerializer.serialize(clothes_by_parent))
 
     # URL example:  /api/v1/clothes
-    all_clothes = DBHelper.get_all_clothes()
+    all_clothes = ClothesDBHelper.get_all_clothes()
     return jsonify(ClothesSerializer.serialize(all_clothes))

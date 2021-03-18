@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, json as flask_json
 
 from looklike.configs import config
-from looklike.db_helper import DBHelper
+from looklike.db_helper import CharactersDBHelper
 from looklike.exceptions import ObjectNotFoundException
 from looklike.serializers import CharactersWithClothesSerializer
 from looklike.redis_client import redis_client, format_cache_key
@@ -25,7 +25,7 @@ def get_characters():
             ), 400
 
         try:
-            character = DBHelper.get_character_by_id(
+            character = CharactersDBHelper.get_character_by_id(
                 character_id,
                 with_clothes=True
                 )
@@ -47,12 +47,12 @@ def get_characters():
                     {'message': 'Argument \'filter_limit\' must be integer!'}
                 ), 400
 
-            filtered_characters = DBHelper.get_newest_characters(
+            filtered_characters = CharactersDBHelper.get_newest_characters(
                 limit=filter_limit,
                 with_clothes=True
             )
         else:
-            filtered_characters = DBHelper.get_newest_characters(
+            filtered_characters = CharactersDBHelper.get_newest_characters(
                 with_clothes=True
             )
 
@@ -78,7 +78,7 @@ def get_characters():
                 response_text = cache_value.decode('utf-8')
                 return response_text, 200, {'Content-Type': 'application/json'}
 
-            characters = DBHelper.get_characters_by_clothes(
+            characters = CharactersDBHelper.get_characters_by_clothes(
                 clothes_ids=clothes_ids,
                 with_clothes=True
             )
@@ -97,5 +97,5 @@ def get_characters():
         return jsonify(serialized)
 
     # URL example:  /api/v1/characters
-    all_characters = DBHelper.get_all_characters(with_clothes=True)
+    all_characters = CharactersDBHelper.get_all_characters(with_clothes=True)
     return jsonify(CharactersWithClothesSerializer.serialize(all_characters))

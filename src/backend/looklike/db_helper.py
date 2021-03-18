@@ -7,7 +7,7 @@ from looklike.exceptions import ObjectNotFoundException
 from looklike.models import Clothes, Character, User
 
 
-class DBHelper:
+class ClothesDBHelper:
     @staticmethod
     def get_all_clothes() -> list[Clothes]:
         with get_db_cursor() as cursor:
@@ -48,6 +48,33 @@ class DBHelper:
         return primary_clothes
 
     @staticmethod
+    def get_clothes_parent_paths(clothes_ids: list[int]) -> list[str]:
+        with get_db_cursor() as cursor:
+            query = 'SELECT parent_path FROM all_clothes WHERE id = any(%s)'
+            cursor.execute(query, (clothes_ids,))
+            data = cursor.fetchall()
+
+        parent_paths = [item['parent_path'] for item in data]
+        return parent_paths
+
+    @staticmethod
+    def get_character_clothes(character: Character) -> list[Clothes]:
+        with get_db_cursor() as cursor:
+            query = (
+                'SELECT id, name, image_path, parent_id, parent_path FROM '
+                'all_clothes WHERE id in (SELECT clothes_id FROM '
+                'clothes_on_characters WHERE character_id = %s) ORDER BY '
+                'display_priority'
+            )
+            cursor.execute(query, (character.id,))
+            data = cursor.fetchall()
+
+        clothes = [Clothes(**item) for item in data]
+        return clothes
+
+
+class CharactersDBHelper:
+    @staticmethod
     def get_all_characters(with_clothes: bool = False) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
@@ -59,29 +86,9 @@ class DBHelper:
         all_characters = [Character(**item) for item in data]
 
         if with_clothes:
-            DBHelper._inject_clothes_to_characters(all_characters)
+            CharactersDBHelper._inject_clothes_to_characters(all_characters)
 
         return all_characters
-
-    @staticmethod
-    def get_newest_characters(
-        limit: int = 10,
-        with_clothes: bool = False
-    ) -> list[Character]:
-        with get_db_cursor() as cursor:
-            cursor.execute(
-                ('SELECT id, author_id, image_path, description, posted_at '
-                 'FROM characters ORDER BY posted_at DESC LIMIT %s;'),
-                (limit,)
-            )
-            data = cursor.fetchall()
-
-        newest_characters = [Character(**item) for item in data]
-
-        if with_clothes:
-            DBHelper._inject_clothes_to_characters(newest_characters)
-
-        return newest_characters
 
     @staticmethod
     def get_character_by_id(
@@ -104,9 +111,29 @@ class DBHelper:
         character = Character(**data)
 
         if with_clothes:
-            DBHelper._inject_clothes_to_characters([character])
+            CharactersDBHelper._inject_clothes_to_characters([character])
 
         return character
+
+    @staticmethod
+    def get_newest_characters(
+        limit: int = 10,
+        with_clothes: bool = False
+    ) -> list[Character]:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                ('SELECT id, author_id, image_path, description, posted_at '
+                 'FROM characters ORDER BY posted_at DESC LIMIT %s;'),
+                (limit,)
+            )
+            data = cursor.fetchall()
+
+        newest_characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            CharactersDBHelper._inject_clothes_to_characters(newest_characters)
+
+        return newest_characters
 
     @staticmethod
     def get_characters_by_clothes(
@@ -114,33 +141,32 @@ class DBHelper:
         with_clothes: bool = False
     ) -> list[Character]:
         with get_db_cursor() as cursor:
-            parent_paths = DBHelper._get_clothes_parent_paths(clothes_ids)
+            parent_paths = ClothesDBHelper.get_clothes_parent_paths(
+                clothes_ids
+            )
 
             if not parent_paths:
                 raise ObjectNotFoundException(
                     'One or more Clothes from the list were not found!'
                 )
 
-            query = DBHelper._format_specific_query(parent_paths)
+            query = CharactersDBHelper._format_specific_query(parent_paths)
             cursor.execute(query, parent_paths)
             data = cursor.fetchall()
 
         characters = [Character(**item) for item in data]
 
         if with_clothes:
-            DBHelper._inject_clothes_to_characters(characters)
+            CharactersDBHelper._inject_clothes_to_characters(characters)
 
         return characters
 
     @staticmethod
-    def _get_clothes_parent_paths(clothes_ids: list[int]) -> list[str]:
-        with get_db_cursor() as cursor:
-            query = 'SELECT parent_path FROM all_clothes WHERE id = any(%s)'
-            cursor.execute(query, (clothes_ids,))
-            data = cursor.fetchall()
-
-        parent_paths = [item['parent_path'] for item in data]
-        return parent_paths
+    def _inject_clothes_to_characters(characters: list[Character]):
+        for character in characters:
+            character.clothes = ClothesDBHelper.get_character_clothes(
+                character
+            )
 
     @staticmethod
     def _format_specific_query(parent_paths: list[str]) -> str:
@@ -158,26 +184,6 @@ class DBHelper:
                 query = f'{query} INTERSECT {base_query}'
 
         return query
-
-    @staticmethod
-    def _inject_clothes_to_characters(characters: list[Character]):
-        for character in characters:
-            character.clothes = DBHelper._get_character_clothes(character)
-
-    @staticmethod
-    def _get_character_clothes(character: Character) -> list[Clothes]:
-        with get_db_cursor() as cursor:
-            query = (
-                'SELECT id, name, image_path, parent_id, parent_path FROM '
-                'all_clothes WHERE id in (SELECT clothes_id FROM '
-                'clothes_on_characters WHERE character_id = %s) ORDER BY '
-                'display_priority'
-            )
-            cursor.execute(query, (character.id,))
-            data = cursor.fetchall()
-
-        clothes = [Clothes(**item) for item in data]
-        return clothes
 
 
 class UsersDBHelper:
