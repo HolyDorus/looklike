@@ -12,28 +12,21 @@ url_prefix = '/api/v1/characters/'
 characters_bp = Blueprint('characters_bp', __name__, url_prefix=url_prefix)
 
 
+@characters_bp.route('<int:character_id>', methods=['GET'])
+def get_character(character_id):
+    try:
+        character = CharactersDBHelper.get_character_by_id(
+            character_id,
+            with_clothes=True
+        )
+    except ObjectNotFoundException as e:
+        return jsonify({'message': str(e)}), 404
+
+    return jsonify(CharactersWithClothesSerializer.serialize(character))
+
+
 @characters_bp.route('', methods=['GET'])
 def get_characters():
-    # URL example:  /api/v1/characters?id=7
-    character_id = request.args.get('id')
-    if character_id:
-        try:
-            character_id = int(character_id)
-        except ValueError:
-            return jsonify(
-                {'message': 'Argument \'character_id\' must be integer!'}
-            ), 400
-
-        try:
-            character = CharactersDBHelper.get_character_by_id(
-                character_id,
-                with_clothes=True
-                )
-        except ObjectNotFoundException as e:
-            return jsonify({'message': str(e)}), 404
-
-        return jsonify(CharactersWithClothesSerializer.serialize(character))
-
     # URL example:  /api/v1/characters?filter=newness&limit=10
     filter_type = request.args.get('filter')
     filter_limit = request.args.get('limit')
