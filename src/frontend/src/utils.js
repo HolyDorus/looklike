@@ -1,3 +1,6 @@
+import { elasticOut } from 'svelte/easing';
+
+
 export function getAllUrlGetParams(url) {
     // get query string from url (optional) or window
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -58,4 +61,15 @@ export function getAllUrlGetParams(url) {
     }
   
     return obj;
+}
+
+export function whooshAnimation(node, params) {
+    const existingTransform = getComputedStyle(node).transform.replace('none', '');
+
+    return {
+        delay: params.delay || 0,
+        duration: params.duration || 500,
+        easing: params.easing || elasticOut,
+        css: (t, u) => `transform: ${existingTransform} scale(${t})`
+    };
 }

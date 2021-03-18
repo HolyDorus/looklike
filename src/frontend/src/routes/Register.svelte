@@ -1,10 +1,45 @@
 <script>
+    import { link, navigate } from "svelte-routing";
+
     import Header from './../components/Header.svelte';
 
+    import { whooshAnimation } from '../utils.js';
+    import { RegisterFormValidator } from '../form-validators.js';
 
-    function submitRegisterFormHandler() {
-        alert('Знаходиться в розробці...')
+
+    let errors = [];
+
+    
+    async function submitRegisterFormHandler(event) {
+        event.preventDefault();
+
+        const validator = new RegisterFormValidator(event.target);
+        const validationErrors = validator.validate();
+
+        if (validationErrors.length) {
+            errors = validationErrors;
+            return;
+        }
+
+        // await tryToRegister(validator.login, validator.password);
+
+        navigate('/');
     }
+
+    // async function tryToRegister(login, password) {
+    //     const response = await fetch(`${apiUrl}/users/register`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: {
+    //             login,
+    //             password
+    //         }
+    //     });
+    //     return await response.json();
+    // };
 </script>
 
 <svelte:head>
@@ -13,7 +48,18 @@
 
 <Header/>
 <div class="container">
-    <div class="lr-card">
+    {#if errors.length }
+        <div in:whooshAnimation class="block-status b-errors">
+            <span>Помилки:</span>
+            <ul>
+                {#each errors as error}
+                    <li>{error}</li>
+                {/each}
+            </ul>
+        </div>
+    {/if}
+
+    <div class="lr-card" class:min-margin-if-errors = "{errors.length}">
         <div class="lr-card-title">Реєстрація</div>
         <div class="lr-card-main">
             <form on:submit={submitRegisterFormHandler} method="POST">
@@ -21,72 +67,12 @@
                     <div class="lr-card-fields-wrapper">
                         <label>Логін: <input type="text" name="login"></label>
                         <label>Пароль: <input type="password" name="password"></label>
-                        <label>Підтвердження паролю: <input type="password" name="password"></label>
+                        <label>Підтвердження паролю: <input type="password" name="passwordConfirmation"></label>
                     </div>
                     <button type="submit" class="black-button lr-card-button">Зареєструватися</button>
                 </div>
             </form>
         </div>
-        <div class="lr-card-additionally">У вас вже є акаунту? <a href="/login" class="lr-card-link">Увійти</a></div>
+        <div class="lr-card-additionally">У вас вже є акаунту? <a href="/login" class="lr-card-link" use:link>Увійти</a></div>
     </div>
 </div>
-
-<style>
-    .lr-card {
-        margin: 100px auto 0 auto;
-        background-color: inherit;
-        max-width: 450px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-
-    .lr-card-title {
-        text-align: center;
-        padding-top: 20px;
-        padding-bottom: 25px;
-        font-size: 2rem;
-        font-weight: 500;
-    }
-
-    .lr-card-additionally {
-        text-align: center;
-        padding-top: 30px;
-        padding-bottom: 20px;
-    }
-
-    .lr-card-button {
-        width: 100%;
-        font-size: 1.3rem;
-        padding: 10px 0;
-    }
-
-    .lr-card-link {
-        text-decoration: underline;
-        color: rgb(5, 105, 220);
-    }
-
-    .lr-card-main label {
-        display: block;
-    }
-
-    .lr-card-form-container {
-        padding: 0 10%;
-    }
-
-    .lr-card-fields-wrapper {
-        padding-bottom: 10px;
-    }
-
-    .lr-card-fields-wrapper input {
-        width: 100%;
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-        margin-top: 7px;
-        padding: 5px 10px;
-        color: #383838;
-        outline: rgb(161, 161, 161) solid 1px;
-    }
-
-    .lr-card-fields-wrapper input:focus {
-        outline: rgb(102, 102, 102) solid 2px;
-    }
-</style>

@@ -6,7 +6,7 @@
     <div class="container">
         <div class="header-wrapper">
             <a href="/" class="logo" use:link>
-                <img src="images/logo.png" alt="Логотип">
+                <img src="images/logo.png" alt="Логотип" width=102 height=35>
             </a>
             <ul class="navbar">
                 <li>

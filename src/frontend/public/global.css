@@ -190,6 +190,10 @@ input, button {
 
 
 /* Login/Register card Start */
+.min-margin-if-errors {
+    margin: 20px auto !important;
+}
+
 .lr-card {
     margin: 100px auto 0 auto;
     background-color: inherit;

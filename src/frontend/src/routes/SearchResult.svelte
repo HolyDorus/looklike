@@ -1,25 +1,13 @@
 <script>
     import { onMount } from 'svelte';
-    import { elasticOut } from 'svelte/easing';
     import { navigate } from "svelte-routing";
     
     import CharactersCard from '../components/CharactersCard.svelte';
     import Header from './../components/Header.svelte';
 
     import { apiUrl } from '../settings';
-    import { getAllUrlGetParams } from '../utils.js';
+    import { getAllUrlGetParams, whooshAnimation } from '../utils.js';
 
-    
-    function whooshAnimation(node, params) {
-		const existingTransform = getComputedStyle(node).transform.replace('none', '');
-
-		return {
-			delay: params.delay || 0,
-			duration: params.duration || 400,
-			easing: params.easing || elasticOut,
-			css: (t, u) => `transform: ${existingTransform} scale(${t})`
-		};
-	}
 
     let error;
     let searchResult = [];
@@ -81,7 +69,7 @@
     {/if}
 
     {#if error}
-        <div transition:whooshAnimation class="block-status b-errors">
+        <div in:whooshAnimation class="block-status b-errors">
             <span>Помилки:</span>
             <ul>
                 <li>{error}</li>
