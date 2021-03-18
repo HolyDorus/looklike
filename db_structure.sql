@@ -2,7 +2,7 @@ CREATE EXTENSION ltree;
 
 CREATE TABLE all_clothes (
     id SERIAL PRIMARY KEY,
-    name TEXT,
+    name VARCHAR(100) NOT NULL,
     image_path VARCHAR(250),
     parent_id INTEGER REFERENCES all_clothes ON DELETE CASCADE,
     parent_path LTREE,
@@ -21,6 +21,13 @@ CREATE TABLE clothes_on_characters (
     id SERIAL PRIMARY KEY,
     character_id INTEGER REFERENCES characters ON DELETE CASCADE,
     clothes_id INTEGER REFERENCES all_clothes ON DELETE CASCADE
+);
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(40) NOT NULL UNIQUE,
+    password_hash VARCHAR(70) NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX all_clothes_parent_path_idx ON all_clothes USING GIST (parent_path);

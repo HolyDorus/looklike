@@ -31,3 +31,17 @@ class Character:
 
     def __repr__(self):
         return f'<Character id={self.id} Description={self.description}>'
+
+
+@dataclass
+class User:
+    id: int
+    username: str
+    password_hash: str
+    registered_at: datetime
+
+    def __str__(self):
+        return f'<User id={self.id} Username={self.username}>'
+
+    def __repr__(self):
+        return f'<User id={self.id} Username={self.username}>'

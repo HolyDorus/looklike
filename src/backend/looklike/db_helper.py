@@ -1,6 +1,10 @@
+from typing import Optional
+
+from looklike.authorizations import JWTAuthorization
+from looklike.configs import config
 from looklike.database import get_db_cursor
 from looklike.exceptions import ObjectNotFoundException
-from looklike.models import Clothes, Character
+from looklike.models import Clothes, Character, User
 
 
 class DBHelper:
@@ -174,3 +178,35 @@ class DBHelper:
 
         clothes = [Clothes(**item) for item in data]
         return clothes
+
+
+class UsersDBHelper:
+    @staticmethod
+    def get_user_by_username(username: str) -> Optional[User]:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                ('SELECT id, username, password_hash, registered_at FROM '
+                 'users WHERE username = %s;'), (username,)
+            )
+            data = cursor.fetchone()
+
+        if not data:
+            raise ObjectNotFoundException(
+                'User with this name was not found!'
+            )
+
+        return User(**data)
+
+    @staticmethod
+    def create_user(username: str, password: str) -> User:
+        auth = JWTAuthorization(secret_key=config.SECRET_KEY)
+        password_hash = auth.generate_password(password)
+
+        with get_db_cursor(commit=True) as cursor:
+            cursor.execute(
+                ('INSERT INTO users (username, password_hash) VALUES (%s, %s) '
+                 'RETURNING id, registered_at'), (username, password_hash)
+            )
+            data = cursor.fetchone()
+
+        return User(data['id'], username, password_hash, data['registered_at'])
