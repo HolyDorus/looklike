@@ -1,10 +1,14 @@
-from typing import Optional
-
 from looklike.authorizations import JWTAuthorization
 from looklike.configs import config
 from looklike.database import get_db_cursor
-from looklike.exceptions import ObjectNotFoundException
-from looklike.models import Clothes, Character, User
+from looklike.exceptions import (
+    ObjectNotFoundException,
+    UserAlreadyExistsException
+)
+from looklike.models import (
+    Clothes, Character,
+    User, UserRegistration
+)
 
 
 class ClothesDBHelper:
@@ -188,7 +192,7 @@ class CharactersDBHelper:
 
 class UsersDBHelper:
     @staticmethod
-    def get_user_by_username(username: str) -> Optional[User]:
+    def get_user_by_username(username: str) -> User:
         with get_db_cursor() as cursor:
             cursor.execute(
                 ('SELECT id, username, password_hash, registered_at FROM '
@@ -204,15 +208,36 @@ class UsersDBHelper:
         return User(**data)
 
     @staticmethod
-    def create_user(username: str, password: str) -> User:
+    def is_user_exists(username: str) -> bool:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                'SELECT EXISTS (SELECT 1 FROM users WHERE username = %s);',
+                (username,)
+            )
+            data = cursor.fetchone()
+
+        return data.get('exists')
+
+    @staticmethod
+    def create_user(user: UserRegistration) -> User:
+        if UsersDBHelper.is_user_exists(user.username):
+            raise UserAlreadyExistsException(
+                'User with this name already exists!'
+            )
+
         auth = JWTAuthorization(secret_key=config.SECRET_KEY)
-        password_hash = auth.generate_password(password)
+        password_hash = auth.generate_password(user.password)
 
         with get_db_cursor(commit=True) as cursor:
             cursor.execute(
                 ('INSERT INTO users (username, password_hash) VALUES (%s, %s) '
-                 'RETURNING id, registered_at'), (username, password_hash)
+                 'RETURNING id, registered_at'), (user.username, password_hash)
             )
             data = cursor.fetchone()
 
-        return User(data['id'], username, password_hash, data['registered_at'])
+        return User(
+            id=data['id'],
+            username=user.username,
+            password_hash=password_hash,
+            registered_at=data['registered_at']
+        )

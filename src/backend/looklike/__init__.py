@@ -1,4 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
+
+from pydantic import ValidationError
 
 from looklike.configs import config
 from looklike.blueprints.clothes_routes import clothes_bp
@@ -13,5 +15,9 @@ def create_app() -> Flask:
     app.register_blueprint(clothes_bp)
     app.register_blueprint(characters_bp)
     app.register_blueprint(users_bp)
+
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(e):
+        return jsonify(e.errors()), 400
 
     return app

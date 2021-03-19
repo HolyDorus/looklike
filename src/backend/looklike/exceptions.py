@@ -4,3 +4,7 @@ class ObjectNotFoundException(Exception):
 
 class AuthorizationException(Exception):
     pass
+
+
+class UserAlreadyExistsException(Exception):
+    pass

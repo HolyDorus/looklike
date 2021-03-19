@@ -1,7 +1,7 @@
 from typing import Union
 
 from looklike.configs import config
-from looklike.models import Clothes, Character, User
+from looklike.models import Clothes, Character
 
 
 class ClothesSerializer():
@@ -100,24 +100,3 @@ class CharactersWithClothesSerializer():
             ]
         else:
             return cls.serialize_one(characters)
-
-
-class UserSerializer():
-    @classmethod
-    def serialize(cls, users) -> Union[dict, list]:
-        if isinstance(users, list) or isinstance(users, tuple):
-            return [cls.serialize_one(user) for user in users]
-        else:
-            return cls.serialize_one(users)
-
-    @classmethod
-    def serialize_one(cls, user: User) -> dict:
-        return {
-            'id': user.id,
-            'username': user.username,
-            'registered_at': {
-                'date': user.registered_at.strftime('%d.%m.%Y'),
-                'time': user.registered_at.strftime('%H:%M:%S'),
-                'full': user.registered_at.strftime('%d.%m.%Y %H:%M:%S')
-            }
-        }
