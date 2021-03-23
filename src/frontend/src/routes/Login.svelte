@@ -1,10 +1,12 @@
 <script>
-    import { link, navigate } from "svelte-routing";
+    import { link, navigate } from 'svelte-routing';
 
-    import Header from './../components/Header.svelte';
+    import Header from '../components/Header.svelte';
 
-    import { whooshAnimation } from '../utils.js';
+    import { setToken } from '../auth.js'
+    import { apiUrl } from '../settings';
     import { LoginFormValidator } from '../form-validators.js';
+    import { whooshAnimation } from '../utils.js';
 
 
     let errors = [];
@@ -21,25 +23,41 @@
             return;
         }
 
-        // await tryToLogin(validator.login, validator.password);
+        const tokenObject = await tryLogin(validator.username, validator.password);
 
-        navigate('/');
+        if (tokenObject) {
+            setToken(tokenObject.access_token);
+            navigate('/');
+        }
     }
 
-    // async function tryToLogin(login, password) {
-    //     const response = await fetch(`${apiUrl}/users/login`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: {
-    //             login,
-    //             password
-    //         }
-    //     });
-    //     return await response.json();
-    // };
+    async function tryLogin(username, password) {
+        try {
+            const response = await fetch(`${apiUrl}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username, password})
+            });
+
+            if (response.status === 404) {
+                errors = ['Не знайдено користувача з таким ім\'ям!']
+                return null;
+            }
+
+            if (response.status === 401) {
+                errors = ['Надано невірний пароль!']
+                return null;
+            }
+
+            return await response.json();
+        }
+        catch (e) {
+            navigate('/oops');
+        }
+    };
 </script>
 
 <svelte:head>
@@ -65,7 +83,7 @@
             <form on:submit={submitLoginFormHandler} method="POST">
                 <div class="lr-card-form-container">
                     <div class="lr-card-fields-wrapper">
-                        <label>Логін: <input type="text" name="login"></label>
+                        <label>Логін: <input type="text" name="username"></label>
                         <label>Пароль: <input type="password" name="password"></label>
                     </div>
                     <button type="submit" class="black-button lr-card-button">Увійти</button>

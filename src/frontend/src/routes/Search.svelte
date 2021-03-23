@@ -1,8 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    import { navigate } from "svelte-routing";
+    import { navigate } from 'svelte-routing';
 
-    import Header from './../components/Header.svelte';
+    import Header from '../components/Header.svelte';
     import ClothesBox from './../components/ClothesBox.svelte';
 
     import { apiUrl } from '../settings';

@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
 
-    import Header from './../components/Header.svelte';
+    import Header from '../components/Header.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
     import { apiUrl } from '../settings';

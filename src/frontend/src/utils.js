@@ -63,6 +63,16 @@ export function getAllUrlGetParams(url) {
     return obj;
 }
 
+export function get_time_from_unix(unix) {
+    let date = new Date(unix * 1000)
+    return date.toString('HH:MM:ss')
+}
+
+export function get_date_from_unix(unix) {
+    let date = new Date(unix * 1000)
+    return date.toString('dd.MM.yyyy')
+}
+
 export function whooshAnimation(node, params) {
     const existingTransform = getComputedStyle(node).transform.replace('none', '');
 

@@ -1,10 +1,12 @@
 <script>
-    import { link, navigate } from "svelte-routing";
+    import { link, navigate } from 'svelte-routing';
 
-    import Header from './../components/Header.svelte';
+    import Header from '../components/Header.svelte';
 
-    import { whooshAnimation } from '../utils.js';
+    import { setToken } from '../auth.js'
+    import { apiUrl } from '../settings';
     import { RegisterFormValidator } from '../form-validators.js';
+    import { whooshAnimation } from '../utils.js';
 
 
     let errors = [];
@@ -21,25 +23,50 @@
             return;
         }
 
-        // await tryToRegister(validator.login, validator.password);
+        const tokenObject = await tryRegister(validator.username, validator.password);
 
-        navigate('/');
+        if (tokenObject) {
+            setToken(tokenObject.access_token);
+            navigate('/');
+        }
     }
 
-    // async function tryToRegister(login, password) {
-    //     const response = await fetch(`${apiUrl}/users/register`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: {
-    //             login,
-    //             password
-    //         }
-    //     });
-    //     return await response.json();
-    // };
+    async function tryRegister(username, password) {
+        try {
+            const RegisterResponse = await fetch(`${apiUrl}/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username, password})
+            });
+
+            
+            console.log(RegisterResponse.status)
+
+
+            if (RegisterResponse.status === 409) {
+                errors = ['Користувач з таким ім\'ям вже існує!']
+                return null;
+            }
+
+            const LoginResponse = await fetch(`${apiUrl}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username, password})
+            });
+
+            return await LoginResponse.json();
+        }
+        catch (e) {
+            console.log(e)
+            navigate('/oops');
+        }
+    };
 </script>
 
 <svelte:head>
@@ -65,7 +92,7 @@
             <form on:submit={submitRegisterFormHandler} method="POST">
                 <div class="lr-card-form-container">
                     <div class="lr-card-fields-wrapper">
-                        <label>Логін: <input type="text" name="login"></label>
+                        <label>Логін: <input type="text" name="username"></label>
                         <label>Пароль: <input type="password" name="password"></label>
                         <label>Підтвердження паролю: <input type="password" name="passwordConfirmation"></label>
                     </div>

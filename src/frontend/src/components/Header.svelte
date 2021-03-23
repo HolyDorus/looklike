@@ -1,5 +1,12 @@
 <script>
-    import { link } from "svelte-routing";
+    import { link } from 'svelte-routing';
+
+    import { isAuthorized, logOut } from '../auth.js'
+
+
+    function logOutLinkClickHandler() {
+        logOut();
+    }
 </script>
 
 <header>
@@ -12,12 +19,22 @@
                 <li>
                     <a href="/search" use:link>Пошук</a>
                 </li>
-                <li>
-                    <a href="/register" use:link>Зареєструватися</a>
-                </li>
-                <li>
-                    <a href="/login" use:link>Увійти</a>
-                </li>
+
+                {#if isAuthorized()}
+                    <li>
+                        <a href="/favorite" use:link>Вподобані образи</a>
+                    </li>
+                    <li>
+                        <a href="/" class="logout-link" on:click={logOutLinkClickHandler}>Вийти</a>
+                    </li>
+                {:else}
+                    <li>
+                        <a href="/register" use:link>Зареєструватися</a>
+                    </li>
+                    <li>
+                        <a href="/login" use:link>Увійти</a>
+                    </li>
+                {/if}
             </ul>
         </div>
     </div>
@@ -68,5 +85,14 @@
     #fake-header-area {
         width: 100%;
         height: 59px;
+    }
+
+    .logout-link {
+        transition: 0.2s all !important;
+    }
+
+    .logout-link:hover {
+        transition: 0.2s all !important;
+        color: rgb(228, 2, 2) !important;
     }
 </style>

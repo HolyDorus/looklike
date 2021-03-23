@@ -1,9 +1,9 @@
 <script>
     import { onMount } from 'svelte';
-    import { navigate } from "svelte-routing";
+    import { navigate } from 'svelte-routing';
     
     import CharactersCard from '../components/CharactersCard.svelte';
-    import Header from './../components/Header.svelte';
+    import Header from '../components/Header.svelte';
 
     import { apiUrl } from '../settings';
     import { getAllUrlGetParams, whooshAnimation } from '../utils.js';

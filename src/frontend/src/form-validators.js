@@ -7,11 +7,11 @@ export class RegisterFormValidator {
     validate() {
         const formData = new FormData(this.form);
 
-        this.login = formData.get('login');
+        this.username = formData.get('username');
         this.password = formData.get('password');
         this.passwordConfirmation = formData.get('passwordConfirmation');
 
-        this.validateLogin();
+        this.validateUsername();
         this.validatePassword();
         this.validatePasswordConfirmation();
         this.comparePasswords();
@@ -19,16 +19,20 @@ export class RegisterFormValidator {
         return this.validationErrors;
     }
 
-    validateLogin() {
-        if (!this.login) {
+    validateUsername() {
+        if (!this.username) {
             this.validationErrors.push('Поле логіну є обов\'язковим для заповнення');
             return;
         }
 
-        const isOnlyHasAllowedCharacters = /^[a-zA-Z1-9]+$/.test(this.login);
+        const isOnlyHasAllowedCharacters = /^[a-zA-Z1-9]+$/.test(this.username);
 
         if (!isOnlyHasAllowedCharacters) {
             this.validationErrors.push('Логін повинен містити лише латинські літери та цифри!');
+        }
+
+        if (this.username.length < 3 || this.username.length > 30) {
+            this.validationErrors.push('Логін повинен містити від трьох до тридцяти символів!');
         }
     }
 
@@ -80,17 +84,17 @@ export class LoginFormValidator {
     validate() {
         const formData = new FormData(this.form);
 
-        this.login = formData.get('login');
+        this.username = formData.get('username');
         this.password = formData.get('password');
 
-        this.validateLogin();
+        this.validateUsername();
         this.validatePassword();
 
         return this.validationErrors;
     }
 
-    validateLogin() {
-        if (!this.login) {
+    validateUsername() {
+        if (!this.username) {
             this.validationErrors.push('Поле логіну є обов\'язковим для заповнення');
         }
     }
