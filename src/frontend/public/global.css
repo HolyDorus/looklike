@@ -1,9 +1,11 @@
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
+    border: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     font-family: 'Roboto', sans-serif;
+    font-size: 10px;
 }
 
 html {
@@ -17,6 +19,10 @@ body {
 a {
     text-decoration: none;
     color: white;
+}
+
+h1 {
+    font-size: 3.2rem;
 }
 
 ul, li {
@@ -48,7 +54,7 @@ input, button {
     display: none;
     opacity: 0;
     text-transform: none; 
-    font-size: 1rem;
+    font-size: 1.6rem;
 }
 
 [tooltip]::before
@@ -135,7 +141,7 @@ input, button {
 .black-button {
     display: inline-block;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.9rem;
     letter-spacing: 1px;
     padding: 15px 30px;
     cursor: pointer;
@@ -163,7 +169,10 @@ input, button {
     border-radius: 10px;
     padding: 10px 20px;
     margin: 20px 0;
-    font-size: 1.1rem;
+}
+
+.block-status span {
+    font-size: 1.76rem;
 }
 
 .block-status ul {
@@ -173,6 +182,7 @@ input, button {
 
 .block-status li {
     display: list-item;
+    font-size: 1.76rem;
 }
 
 .b-errors {
@@ -205,29 +215,31 @@ input, button {
     text-align: center;
     padding-top: 20px;
     padding-bottom: 25px;
-    font-size: 2rem;
+    font-size: 3.2rem;
     font-weight: 500;
 }
 
 .lr-card-additionally {
     text-align: center;
-    padding-top: 30px;
-    padding-bottom: 20px;
+    padding: 30px 20px 20px 20px;
+    font-size: 1.6rem;
 }
 
 .lr-card-button {
     width: 100%;
-    font-size: 1.3rem;
+    font-size: 2rem;
     padding: 10px 0;
 }
 
 .lr-card-link {
     text-decoration: underline;
     color: rgb(5, 105, 220);
+    font-size: 1.6rem;
 }
 
 .lr-card-main label {
     display: block;
+    font-size: 1.6rem;
 }
 
 .lr-card-form-container {
@@ -240,7 +252,7 @@ input, button {
 
 .lr-card-fields-wrapper input {
     width: 100%;
-    font-size: 1.5rem;
+    font-size: 2.4rem;
     margin-bottom: 15px;
     margin-top: 7px;
     padding: 5px 10px;
@@ -252,3 +264,54 @@ input, button {
     outline: rgb(102, 102, 102) solid 2px;
 }
 /* Login/Register card End */
+
+
+/* Material Icons Start */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+}
+/* Material Icons End */
+
+
+.characters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 32%);
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .characters-grid {
+        grid-template-columns: repeat(2, 49%);
+    }
+}
+
+@media (max-width: 550px) {
+    .characters-grid {
+        grid-template-columns: 100%;
+    }
+
+    .lr-card {
+        margin: 30px auto 0 auto;
+    }
+}

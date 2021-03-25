@@ -124,7 +124,7 @@
     }
 
     async function loadClothesChildren(parent_id) {
-        const url = `${apiUrl}/clothes/?parent_id=${parent_id}`;
+        const url = `${apiUrl}/clothes/by-parent-id/${parent_id}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -184,12 +184,12 @@
 
     :global(.clothes-box h1) {
         font-weight: 400;
-        font-size: 1.8rem;
+        font-size: 2.88rem;
     }
 
     :global(.clothes-box h2) {
         font-weight: 400;
-        font-size: 1.25rem;
+        font-size: 2rem;
     }
 
     :global(.clothes-box__container) {
@@ -212,11 +212,11 @@
     :global(.clothes-box__container__item span) {
         display: block;
         text-align: center;
-        font-size: 0.8rem;
+        font-size: 1.28rem;
         margin-top: 5px;
         padding: 10px 8px;
         transition: 0.3s all;
-        line-height: 0.9rem;
+        line-height: 1.44rem;
     }
 
     :global(.clothes-box__container__item:hover .img-wrapper img) {

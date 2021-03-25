@@ -12,6 +12,10 @@ export function isAuthorized() {
     return token && token !== 'undefined';
 }
 
+export function formatAuthorizationHeader() {
+    return `Bearer ${getToken()}`
+}
+
 export function logOut() {
     setToken('');
 }

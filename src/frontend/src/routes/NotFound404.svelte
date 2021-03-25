@@ -59,9 +59,6 @@
         height: 120px;
         background-image: url('../images/emoji.png');
         background-size: cover;
-        -webkit-transform: scale(1.2);
-        -ms-transform: scale(1.2);
-        transform: scale(1.2);
         z-index: -1;
     }
 
@@ -75,6 +72,6 @@
     .notfound p {
         color: #787878;
         font-weight: 300;
-        margin: 1rem 0 2rem 0;
+        margin: 1.6rem 0 3.2rem 0;
     }
 </style>

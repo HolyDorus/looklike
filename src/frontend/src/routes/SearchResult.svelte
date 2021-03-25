@@ -5,6 +5,7 @@
     import CharactersCard from '../components/CharactersCard.svelte';
     import Header from '../components/Header.svelte';
 
+    import { isAuthorized, formatAuthorizationHeader } from '../auth.js'
     import { apiUrl } from '../settings';
     import { getAllUrlGetParams, whooshAnimation } from '../utils.js';
 
@@ -36,11 +37,17 @@
     }
 
     async function loadSearchResult(urlPart) {
-        const response = await fetch(`${apiUrl}/characters${urlPart}`, {
+        let request_headers = {
+            'Accept': 'application/json'
+        };
+
+        if (isAuthorized()) {
+            request_headers['Authorization'] = formatAuthorizationHeader();
+        }
+
+        const response = await fetch(`${apiUrl}/characters/find${urlPart}`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: request_headers
         });
 
         let responseData = await response.json();
@@ -87,12 +94,6 @@
         text-align: center;
         margin-top: 20px;
         color: #383838;
-    }
-
-    .characters-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 32%);
-        justify-content: space-between;
     }
 
     .black-button-wrapper {

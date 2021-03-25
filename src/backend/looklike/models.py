@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, validator
 
@@ -29,6 +30,7 @@ class Character:
     description: str
     posted_at: datetime
     clothes: list = field(default_factory=list)
+    is_favorite: Optional[bool] = None
 
     def __str__(self):
         return f'<Character id={self.id} Description={self.description}>'

@@ -4,6 +4,7 @@
     import Header from '../components/Header.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
+    import { isAuthorized, formatAuthorizationHeader } from '../auth.js';
     import { apiUrl } from '../settings';
 
 
@@ -15,11 +16,17 @@
     });
 
     async function loadNewessCharacters() {
-        const response = await fetch(`${apiUrl}/characters?filter=newness&limit=3`, {
+        let request_headers = {
+            'Accept': 'application/json'
+        };
+
+        if (isAuthorized()) {
+            request_headers['Authorization'] = formatAuthorizationHeader();
+        }
+
+        const response = await fetch(`${apiUrl}/characters/filter?type=newness&limit=3`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: request_headers
         });
 
         let responseData = await response.json();
@@ -60,13 +67,7 @@
 <style>
     h1 {
         text-align: center;
-        margin-top: 50px;
+        margin-top: 20px;
         color: #383838;
-    }
-
-    .characters-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 32%);
-        justify-content: space-between;
     }
 </style>

@@ -17,7 +17,7 @@
     <Route path='/login/' component={Login}/>
     <Route path='/search/' component={Search}/>
     <Route path='/search-result/' component={SearchResult}/>
-    <Route path='/favorite/' component={FavoriteCharacters}/>
+    <Route path='/favorites/' component={FavoriteCharacters}/>
 
     <!-- Register Oops page -->
     <Route path='/oops/' component={Oops}/>

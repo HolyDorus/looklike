@@ -83,8 +83,8 @@
             <form on:submit={submitLoginFormHandler} method="POST">
                 <div class="lr-card-form-container">
                     <div class="lr-card-fields-wrapper">
-                        <label>Логін: <input type="text" name="username"></label>
-                        <label>Пароль: <input type="password" name="password"></label>
+                        <label>Логін: <input type="text" name="username" autocomplete="username"></label>
+                        <label>Пароль: <input type="password" name="password" autocomplete="current-password"></label>
                     </div>
                     <button type="submit" class="black-button lr-card-button">Увійти</button>
                 </div>

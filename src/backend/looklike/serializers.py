@@ -69,7 +69,7 @@ class CharactersSerializer():
     def serialize_one(cls, character: Character) -> dict:
         image_url = f'{config.MEDIA_URL}{character.image_path}'
 
-        return {
+        output_data = {
             'id': character.id,
             'author_id': character.author_id,
             'image_path': image_url,
@@ -80,6 +80,11 @@ class CharactersSerializer():
                 'full': character.posted_at.strftime('%d.%m.%Y %H:%M:%S')
             }
         }
+
+        if character.is_favorite is not None:
+            output_data['is_favorite'] = character.is_favorite
+
+        return output_data
 
 
 class CharactersWithClothesSerializer():

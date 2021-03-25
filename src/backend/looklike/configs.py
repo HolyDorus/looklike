@@ -11,8 +11,11 @@ load_dotenv()
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY')
     POSTGRESQL_URL = os.getenv('POSTGRESQL_URL')
+
     REDIS_URL = os.getenv('REDIS_URL')
+    REDIS_CACHING = True
     REDIS_CACHE_EXPIRE = 10 * 60
+
     AVAILABLE_HOSTS = '*'
     JSON_SORT_KEYS = False
     MEDIA_URL = os.getenv('MEDIA_URL')
@@ -20,6 +23,10 @@ class BaseConfig:
 
 class DevConfig(BaseConfig):
     DEBUG = True
+
+
+class WithOutCachingDevConfig(DevConfig):
+    REDIS_CACHING = False
 
 
 class ProdConfig(BaseConfig):

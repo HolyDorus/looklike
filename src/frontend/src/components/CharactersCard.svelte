@@ -1,11 +1,38 @@
 <script>
+    import { navigate } from "svelte-routing";
+
+    import { isAuthorized } from "../auth";
+
+
     export let character;
+    let localCharacter = {...character}
+
+    function likeButtonClickHandler(event) {
+        if (!isAuthorized()) {
+            navigate('/login');
+            return;
+        }
+
+        console.log('Do', localCharacter.is_favorite)
+
+        localCharacter.is_favorite = !localCharacter.is_favorite;
+
+        console.log('Posle', localCharacter.is_favorite)
+    }
 </script>
 
 <div class="character-item">
-    <img src={character.image_path} class="character-item__image" alt="Образ">
+    <button class="like-button" on:click={likeButtonClickHandler}>
+        {#if localCharacter.is_favorite}
+            <i class="material-icons active-like-icon">favorite</i>
+        {:else}
+            <i class="material-icons disactive-like-icon">favorite_border</i>
+        {/if}
+    </button>
+
+    <img src={localCharacter.image_path} class="character-item__image" alt="Образ">
     <div class="character-item__clothes-grid" >
-        {#each character.clothes as clothes}
+        {#each localCharacter.clothes as clothes}
             <div class="character-item__clothes-wrapper">
                 <div tooltip={clothes.name}>
                     <img src={clothes.image_path} class="character-item__clothes-image" alt={clothes.name}>
@@ -13,9 +40,9 @@
             </div>
         {/each}
     </div>
-    <p>{character.description}</p>
+    <p>{localCharacter.description}</p>
     <div class="character-item__date-wrapper">
-        <span tooltip={character.posted_at.time}>{character.posted_at.date}</span>
+        <span tooltip={localCharacter.posted_at.time}>{localCharacter.posted_at.date}</span>
     </div>
 </div>
 
@@ -63,7 +90,7 @@
 
     .character-item p {
         padding: 15px 15px 55px 15px;
-        font-size: 0.9rem;
+        font-size: 1.44rem;
     }
 
     .character-item__date-wrapper {
@@ -74,7 +101,50 @@
 
     .character-item__date-wrapper span {
         position: relative;
-        font-size: 0.9rem;
+        font-size: 1.44rem;
         color: rgb(119, 119, 119);
+    }
+
+    .like-button {
+        position: absolute;
+        right: 0;
+        top: 5px;
+        height: 50px;
+        width: 50px;
+        background-color: transparent;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s all;
+        z-index: 2;
+    }
+
+    .character-item::after {
+        content: '';
+        position: absolute;
+        top: 0px;
+        right: 0;
+        width: 70px;
+        height: 70px;
+        background-color: rgb(255, 254, 248);
+        border-radius: 0 0 0 100%;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .like-button:hover {
+        background-color: rgba(255, 255, 255, 0.1);        
+        transition: 0.2s all;
+    }
+
+    .disactive-like-icon {
+        color: #f7c121;
+        font-size: 35px !important;
+        transition: 0.2s all;
+    }
+
+    .active-like-icon  {
+        color: #f7c121;
+        font-size: 35px !important;
+        transition: 0.2s all;
     }
 </style>

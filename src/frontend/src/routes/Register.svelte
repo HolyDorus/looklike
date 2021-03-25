@@ -92,9 +92,9 @@
             <form on:submit={submitRegisterFormHandler} method="POST">
                 <div class="lr-card-form-container">
                     <div class="lr-card-fields-wrapper">
-                        <label>Логін: <input type="text" name="username"></label>
-                        <label>Пароль: <input type="password" name="password"></label>
-                        <label>Підтвердження паролю: <input type="password" name="passwordConfirmation"></label>
+                        <label>Логін: <input type="text" name="username" autocomplete="username"></label>
+                        <label>Пароль: <input type="password" name="password" autocomplete="new-password"></label>
+                        <label>Підтвердження паролю: <input type="password" name="passwordConfirmation" autocomplete="new-password"></label>
                     </div>
                     <button type="submit" class="black-button lr-card-button">Зареєструватися</button>
                 </div>

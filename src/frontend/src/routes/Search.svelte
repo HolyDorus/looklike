@@ -55,7 +55,7 @@
     }
 
     async function loadPrimaryClothes() {
-        const response = await fetch(`${apiUrl}/clothes/?primary_only`, {
+        const response = await fetch(`${apiUrl}/clothes/primary`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'

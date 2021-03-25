@@ -8,3 +8,7 @@ class AuthorizationException(Exception):
 
 class UserAlreadyExistsException(Exception):
     pass
+
+
+class CharacterAlreadyInFavorites(Exception):
+    pass

@@ -1,9 +1,12 @@
+from typing import Optional
+
 from looklike.authorizations import JWTAuthorization
 from looklike.configs import config
 from looklike.database import get_db_cursor
 from looklike.exceptions import (
     ObjectNotFoundException,
-    UserAlreadyExistsException
+    UserAlreadyExistsException,
+    CharacterAlreadyInFavorites
 )
 from looklike.models import (
     Clothes, Character,
@@ -79,7 +82,79 @@ class ClothesDBHelper:
 
 class CharactersDBHelper:
     @staticmethod
-    def get_all_characters(with_clothes: bool = False) -> list[Character]:
+    def get_favorites(
+        user_id: int,
+        with_clothes: bool = False
+    ) -> list[Character]:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                ('SELECT id, author_id, image_path, description, posted_at '
+                 'FROM characters WHERE characters.id IN (SELECT character_id '
+                 'FROM favorite_characters_of_users WHERE user_id = %s);'),
+                (user_id,)
+            )
+            data = cursor.fetchall()
+
+        favorite_characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            CharactersDBHelper._inject_clothes_to_characters(
+                favorite_characters
+            )
+
+        if user_id:
+            CharactersDBHelper._inject_is_favorite_field(
+                user_id=user_id,
+                characters=favorite_characters
+            )
+
+        return favorite_characters
+
+    @staticmethod
+    def add_to_favorites(character_id: int, user_id: int) -> None:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                ('SELECT EXISTS (SELECT 1 FROM characters WHERE id = %s);'),
+                (character_id,)
+            )
+            data = cursor.fetchone()
+
+        if not data.get('exists'):
+            raise ObjectNotFoundException(
+                f'Character with id={character_id} not found!'
+            )
+
+        if CharactersDBHelper.is_favorite_character(user_id, character_id):
+            raise CharacterAlreadyInFavorites(
+                'The character already exists in favorites'
+            )
+
+        with get_db_cursor(commit=True) as cursor:
+            cursor.execute(
+                ('INSERT INTO favorite_characters_of_users (character_id, '
+                 'user_id) VALUES (%s, %s);'),
+                (character_id, user_id)
+            )
+
+    @staticmethod
+    def remove_from_favorites(character_id: int, user_id: int) -> None:
+        if not CharactersDBHelper.is_favorite_character(user_id, character_id):
+            raise ObjectNotFoundException(
+                'This character was not found in favorites!'
+            )
+
+        with get_db_cursor(commit=True) as cursor:
+            cursor.execute(
+                ('DELETE FROM favorite_characters_of_users WHERE character_id '
+                 '= %s AND user_id = %s;'),
+                (character_id, user_id)
+            )
+
+    @staticmethod
+    def get_all_characters(
+        user_id: Optional[int] = None,
+        with_clothes: bool = False
+    ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
                 ('SELECT id, author_id, image_path, description, posted_at '
@@ -91,6 +166,12 @@ class CharactersDBHelper:
 
         if with_clothes:
             CharactersDBHelper._inject_clothes_to_characters(all_characters)
+
+        if user_id:
+            CharactersDBHelper._inject_is_favorite_field(
+                user_id=user_id,
+                characters=all_characters
+            )
 
         return all_characters
 
@@ -121,6 +202,7 @@ class CharactersDBHelper:
 
     @staticmethod
     def get_newest_characters(
+        user_id: Optional[int] = None,
         limit: int = 10,
         with_clothes: bool = False
     ) -> list[Character]:
@@ -137,11 +219,18 @@ class CharactersDBHelper:
         if with_clothes:
             CharactersDBHelper._inject_clothes_to_characters(newest_characters)
 
+        if user_id:
+            CharactersDBHelper._inject_is_favorite_field(
+                user_id=user_id,
+                characters=newest_characters
+            )
+
         return newest_characters
 
     @staticmethod
     def get_characters_by_clothes(
         clothes_ids: list[int],
+        user_id: Optional[int] = None,
         with_clothes: bool = False
     ) -> list[Character]:
         with get_db_cursor() as cursor:
@@ -163,13 +252,39 @@ class CharactersDBHelper:
         if with_clothes:
             CharactersDBHelper._inject_clothes_to_characters(characters)
 
+        if user_id:
+            CharactersDBHelper._inject_is_favorite_field(
+                user_id=user_id,
+                characters=characters
+            )
+
         return characters
+
+    @staticmethod
+    def is_favorite_character(user_id: int, character_id: int) -> bool:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                ('SELECT EXISTS (SELECT 1 FROM favorite_characters_of_users '
+                 'WHERE character_id = %s AND user_id = %s);'),
+                (character_id, user_id)
+            )
+            data = cursor.fetchone()
+
+        return data.get('exists')
 
     @staticmethod
     def _inject_clothes_to_characters(characters: list[Character]):
         for character in characters:
             character.clothes = ClothesDBHelper.get_character_clothes(
                 character
+            )
+
+    @staticmethod
+    def _inject_is_favorite_field(user_id: int, characters: list[Character]):
+        for character in characters:
+            character.is_favorite = CharactersDBHelper.is_favorite_character(
+                user_id=user_id,
+                character_id=character.id
             )
 
     @staticmethod
