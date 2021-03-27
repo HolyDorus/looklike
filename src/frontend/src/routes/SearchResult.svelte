@@ -1,12 +1,13 @@
 <script>
     import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
     import { navigate } from 'svelte-routing';
     
     import CharactersCard from '../components/CharactersCard.svelte';
     import Header from '../components/Header.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js'
-    import { apiUrl } from '../settings';
+    import { apiUrl, siteTitle } from '../settings.js';
     import { getAllUrlGetParams, whooshAnimation } from '../utils.js';
 
 
@@ -21,7 +22,11 @@
             if (!result.length) {
                 error = 'На жаль, образів з такими речами не знайдено';
             } else {
-                searchResult = result;
+                for (let item of result) {
+                    searchResult.push(writable(item));
+                }
+
+                searchResult = searchResult;
             }
         }
     });
@@ -61,8 +66,12 @@
         }
 
         return responseData;
-    };
+    }
 </script>
+
+<svelte:head>
+    <title>Результати пошуку | {siteTitle}</title>
+</svelte:head>
 
 <Header/>
 <div class="container">

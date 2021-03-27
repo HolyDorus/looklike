@@ -1,12 +1,13 @@
 <script>
     import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
     import { navigate } from 'svelte-routing';
 
     import Header from '../components/Header.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js'
-    import { apiUrl } from '../settings';
+    import { apiUrl, siteTitle } from '../settings.js';
 
 
     let favoriteCharacters = [];
@@ -14,7 +15,12 @@
     onMount(async () => {
         if (isAuthorized()) {
             const result = await loadFavoriteCharacters();
-            favoriteCharacters = result;
+
+            for (let item of result) {
+                favoriteCharacters.push(writable(item));
+            }
+
+            favoriteCharacters = favoriteCharacters;
         } else {
             navigate('/login');
         }
@@ -40,7 +46,7 @@
 </script>
 
 <svelte:head>
-    <title>Look Like | Вподобані образи</title>
+    <title>Вподобані образи | {siteTitle}</title>
 </svelte:head>
 
 <Header/>

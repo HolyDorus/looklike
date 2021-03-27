@@ -74,6 +74,7 @@ class CharactersSerializer():
             'author_id': character.author_id,
             'image_path': image_url,
             'description': character.description,
+            'likes': character.likes,
             'posted_at': {
                 'date': character.posted_at.strftime('%d.%m.%Y'),
                 'time': character.posted_at.strftime('%H:%M:%S'),

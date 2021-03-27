@@ -1,9 +1,11 @@
 <script>
     import Header from '../components/Header.svelte';
+    
+    import { siteTitle } from '../settings.js';
 </script>
 
 <svelte:head>
-    <title>Look Like | Сторінка не знайдена</title>
+    <title>Сторінка не знайдена | {siteTitle}</title>
 </svelte:head>
 
 <Header/>
@@ -71,6 +73,7 @@
 
     .notfound p {
         color: #787878;
+        font-size: 1.6rem;
         font-weight: 300;
         margin: 1.6rem 0 3.2rem 0;
     }

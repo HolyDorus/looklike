@@ -69,7 +69,7 @@ class ClothesDBHelper:
         with get_db_cursor() as cursor:
             query = (
                 'SELECT id, name, image_path, parent_id, parent_path FROM '
-                'all_clothes WHERE id in (SELECT clothes_id FROM '
+                'all_clothes WHERE id IN(SELECT clothes_id FROM '
                 'clothes_on_characters WHERE character_id = %s) ORDER BY '
                 'display_priority'
             )
@@ -88,9 +88,12 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, author_id, image_path, description, posted_at '
-                 'FROM characters WHERE characters.id IN (SELECT character_id '
-                 'FROM favorite_characters_of_users WHERE user_id = %s);'),
+                ('SELECT c.id, c.author_id, c.image_path, c.description, '
+                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                 'fcou.character_id = c.id WHERE c.id IN(SELECT character_id '
+                 'FROM favorite_characters_of_users WHERE user_id = %s) GROUP '
+                 'BY c.id;'),
                 (user_id,)
             )
             data = cursor.fetchall()
@@ -157,8 +160,10 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, author_id, image_path, description, posted_at '
-                 'FROM characters;')
+                ('SELECT c.id, c.author_id, c.image_path, c.description, '
+                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                 'fcou.character_id = c.id GROUP BY c.id;')
             )
             data = cursor.fetchall()
 
@@ -182,8 +187,10 @@ class CharactersDBHelper:
     ) -> Character:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, author_id, image_path, description, posted_at '
-                 'FROM characters WHERE id = %s;'),
+                ('SELECT c.id, c.author_id, c.image_path, c.description, '
+                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                 'fcou.character_id = c.id WHERE c.id = %s GROUP BY c.id;'),
                 (character_id,)
             )
             data = cursor.fetchone()
@@ -208,8 +215,11 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, author_id, image_path, description, posted_at '
-                 'FROM characters ORDER BY posted_at DESC LIMIT %s;'),
+                ('SELECT c.id, c.author_id, c.image_path, c.description, '
+                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                 'fcou.character_id = c.id GROUP BY c.id ORDER BY c.posted_at '
+                 'DESC LIMIT %s;'),
                 (limit,)
             )
             data = cursor.fetchall()
@@ -244,7 +254,10 @@ class CharactersDBHelper:
                 )
 
             query = CharactersDBHelper._format_specific_query(parent_paths)
+            print(query)
+            print(parent_paths)
             cursor.execute(query, parent_paths)
+            print('Ok')
             data = cursor.fetchall()
 
         characters = [Character(**item) for item in data]
@@ -290,10 +303,13 @@ class CharactersDBHelper:
     @staticmethod
     def _format_specific_query(parent_paths: list[str]) -> str:
         base_query = (
-            'SELECT id, author_id, image_path, description, posted_at FROM '
-            'characters WHERE id IN (SELECT character_id FROM '
-            'clothes_on_characters WHERE clothes_id IN (SELECT id FROM '
-            'all_clothes WHERE parent_path <@ %s))'
+            'SELECT c.id, c.author_id, c.image_path, c.description, '
+            'c.posted_at, COUNT(fcou.character_id) AS likes FROM characters c '
+            'LEFT JOIN favorite_characters_of_users fcou ON fcou.character_id '
+            '= c.id WHERE c.id IN(SELECT coc.character_id FROM '
+            'clothes_on_characters coc WHERE coc.clothes_id IN(SELECT ac.id '
+            'FROM all_clothes ac WHERE ac.parent_path <@ %s)) GROUP '
+            'BY c.id'
         )
 
         for i, _ in enumerate(parent_paths):

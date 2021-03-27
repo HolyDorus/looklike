@@ -5,7 +5,7 @@
     import Header from '../components/Header.svelte';
     import ClothesBox from './../components/ClothesBox.svelte';
 
-    import { apiUrl } from '../settings';
+    import { apiUrl, siteTitle } from '../settings.js';
     import { whooshAnimation } from '../utils.js';
 
 
@@ -62,11 +62,11 @@
             }
         });
         return await response.json();
-    };
+    }
 </script>
 
 <svelte:head>
-    <title>Look Like | Пошук</title>
+    <title>Пошук | {siteTitle}</title>
 </svelte:head>
 
 <Header/>

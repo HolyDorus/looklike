@@ -1,1 +1,2 @@
-export const apiUrl = '/api/v1'; // Default '/api/v1'
+export const siteTitle = 'Look Like'
+export const apiUrl = '/api/v1';

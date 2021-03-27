@@ -73,6 +73,16 @@ export function get_date_from_unix(unix) {
     return date.toString('dd.MM.yyyy')
 }
 
+export function formatBigNumber(number) {
+    if (number > 1_000_000) {
+        return `${(number / 1_000_000).toFixed(1)}M`
+    } else if (number > 1_000) {
+        return `${(number / 1_000).toFixed(1)}K`
+    } else {
+        return `${number}`
+    }
+}
+
 export function whooshAnimation(node, params) {
     const existingTransform = getComputedStyle(node).transform.replace('none', '');
 

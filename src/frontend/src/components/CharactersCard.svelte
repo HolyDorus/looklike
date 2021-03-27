@@ -1,38 +1,87 @@
 <script>
     import { navigate } from "svelte-routing";
 
-    import { isAuthorized } from "../auth";
+    import { isAuthorized, formatAuthorizationHeader } from '../auth.js';
+    import { apiUrl } from '../settings.js';
+    import { formatBigNumber } from '../utils.js';
 
 
     export let character;
-    let localCharacter = {...character}
 
-    function likeButtonClickHandler(event) {
+    async function likeButtonClickHandler(event) {
         if (!isAuthorized()) {
             navigate('/login');
             return;
         }
 
-        console.log('Do', localCharacter.is_favorite)
+        if ($character.is_favorite) {
+            await removeFromFavorites($character.id);
+            $character.is_favorite = false;
+            $character.likes -= 1;
+        } else {
+            await addToFavorites($character.id);
+            $character.is_favorite = true;
+            $character.likes += 1;
+        }
+    }
 
-        localCharacter.is_favorite = !localCharacter.is_favorite;
+    async function removeFromFavorites(character_id) {
+        try {
+            const response = await fetch(`${apiUrl}/characters/${character_id}/remove-from-favorites`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': formatAuthorizationHeader()
+                }
+            });
 
-        console.log('Posle', localCharacter.is_favorite)
+            if (response.status === 401) {
+                navigate('/login');
+                return;
+            }
+
+            if (response.status === 404) {
+                navigate('/oops');
+                return;
+            }
+        }
+        catch (e) {
+            navigate('/oops');
+            return;
+        }
+    }
+
+    async function addToFavorites(character_id) {
+        try {
+            const response = await fetch(`${apiUrl}/characters/${character_id}/add-to-favorites`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': formatAuthorizationHeader()
+                }
+            });
+
+            if (response.status === 401) {
+                navigate('/login');
+                return;
+            }
+
+            if (response.status === 404 || response.status === 400) {
+                navigate('/oops');
+                return;
+            }
+        }
+        catch (e) {
+            navigate('/oops');
+            return;
+        }
     }
 </script>
 
 <div class="character-item">
-    <button class="like-button" on:click={likeButtonClickHandler}>
-        {#if localCharacter.is_favorite}
-            <i class="material-icons active-like-icon">favorite</i>
-        {:else}
-            <i class="material-icons disactive-like-icon">favorite_border</i>
-        {/if}
-    </button>
-
-    <img src={localCharacter.image_path} class="character-item__image" alt="Образ">
+    <img src={$character.image_path} class="character-item__image" alt="Образ">
     <div class="character-item__clothes-grid" >
-        {#each localCharacter.clothes as clothes}
+        {#each $character.clothes as clothes}
             <div class="character-item__clothes-wrapper">
                 <div tooltip={clothes.name}>
                     <img src={clothes.image_path} class="character-item__clothes-image" alt={clothes.name}>
@@ -40,9 +89,18 @@
             </div>
         {/each}
     </div>
-    <p>{localCharacter.description}</p>
-    <div class="character-item__date-wrapper">
-        <span tooltip={localCharacter.posted_at.time}>{localCharacter.posted_at.date}</span>
+    <p>{$character.description}</p>
+    <div class="character-item__additional-wrapper">
+        <span class="character-item__date" tooltip={$character.posted_at.time}>{$character.posted_at.date}</span>
+        <button class="like-button" on:click={likeButtonClickHandler}>
+            {#if $character.is_favorite}
+                <i class="material-icons like-icon active">favorite</i>
+                <span class="character-item__likes-count active">{formatBigNumber($character.likes)}</span>
+            {:else}
+                <i class="material-icons like-icon disactive">favorite_border</i>
+                <span class="character-item__likes-count disactive">{formatBigNumber($character.likes)}</span>
+            {/if}
+        </button>
     </div>
 </div>
 
@@ -89,46 +147,35 @@
     }
 
     .character-item p {
-        padding: 15px 15px 55px 15px;
-        font-size: 1.44rem;
+        padding: 15px 15px 70px 15px;
+        text-align: justify;
+        font-size: 1.6rem;
+        line-height: 1.5em;
     }
 
-    .character-item__date-wrapper {
+    .character-item__additional-wrapper {
         position: absolute;
-        bottom: 20px;
-        right: 20px;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px 15px 15px;
     }
 
-    .character-item__date-wrapper span {
+    .character-item__date {
+        display: block;
         position: relative;
-        font-size: 1.44rem;
-        color: rgb(119, 119, 119);
+        font-size: 1.6rem;
+        color: rgb(82, 82, 82);
     }
 
     .like-button {
-        position: absolute;
-        right: 0;
-        top: 5px;
-        height: 50px;
-        width: 50px;
+        display: flex;
+        align-items: center;
         background-color: transparent;
-        border-radius: 10px;
         cursor: pointer;
         transition: 0.2s all;
-        z-index: 2;
-    }
-
-    .character-item::after {
-        content: '';
-        position: absolute;
-        top: 0px;
-        right: 0;
-        width: 70px;
-        height: 70px;
-        background-color: rgb(255, 254, 248);
-        border-radius: 0 0 0 100%;
-        cursor: pointer;
-        z-index: 1;
     }
 
     .like-button:hover {
@@ -136,15 +183,30 @@
         transition: 0.2s all;
     }
 
-    .disactive-like-icon {
-        color: #f7c121;
-        font-size: 35px !important;
+    .character-item__likes-count {
+        margin-left: 5px;
+        font-size: 1.6rem;
+        font-weight: 500;
+    }
+
+    .like-icon {
+        font-size: 25px !important;
         transition: 0.2s all;
     }
 
-    .active-like-icon  {
+    .disactive {
+        color: rgb(128, 128, 128);
+    }
+
+    .active  {
         color: #f7c121;
-        font-size: 35px !important;
-        transition: 0.2s all;
+    }
+
+    @media (max-width: 768px) {
+        .character-item:hover {
+            /* Removes original hover effect on mobile devices */
+            transform: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
     }
 </style>

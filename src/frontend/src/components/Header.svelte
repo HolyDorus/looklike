@@ -5,34 +5,27 @@
     import { isAuthorized, logOut } from '../auth.js'
 
 
-    onMount(() => {
-        let startPoint={};
-        let nowPoint;
+    let startPoint;
 
+    onMount(() => {
         document.addEventListener('touchstart', function(event) {
-            startPoint.x = event.changedTouches[0].pageX;
-            startPoint.y = event.changedTouches[0].pageY;
+            startPoint = event.changedTouches[0];
         });
 
-        /*Ловим движение пальцем*/
         document.addEventListener('touchmove', function(event) {
-            let otk = {};
-            nowPoint = event.changedTouches[0];
-            otk.x = nowPoint.pageX - startPoint.x;
+            const currentPoint = event.changedTouches[0];
 
-            if(Math.abs(otk.x) > 100) {
-                if(otk.x<0) {
+            const xDifference = currentPoint.clientX - startPoint.clientX;
+            const yDifference = currentPoint.clientY - startPoint.clientY;          
+
+            if(Math.abs(xDifference) > 100 && Math.abs(yDifference) < 50) {
+                if(xDifference < 0) {
                     burgerMenuClose();
                 }
 
-                if(otk.x>0) {
+                if(xDifference > 0) {
                     burgerMenuOpen();
                 }
-
-                startPoint = {
-                    x: nowPoint.pageX,
-                    y: nowPoint.pageY
-                };
             }
         });
     });
@@ -43,31 +36,28 @@
 
     function burgerClickHandler(event) {
         const burger = event.currentTarget;
-        burger.classList.toggle('active');
-
         const menu = burger.nextElementSibling;
-        menu.classList.toggle('active');
 
+        burger.classList.toggle('active');
+        menu.classList.toggle('active');
         document.body.parentElement.classList.toggle('scroll-lock')
     }
 
     function burgerMenuOpen() {
-        let burger = document.querySelector('.header__burger');
+        const burger = document.querySelector('.header__burger');
+        const menu = burger.nextElementSibling;
+
         burger.classList.add('active');
-
-        let menu = burger.nextElementSibling;
         menu.classList.add('active');
-
         document.body.parentElement.classList.add('scroll-lock')
     }
 
     function burgerMenuClose() {
-        let burger = document.querySelector('.header__burger');
+        const burger = document.querySelector('.header__burger');
+        const menu = burger.nextElementSibling;
+
         burger.classList.remove('active');
-
-        let menu = burger.nextElementSibling;
         menu.classList.remove('active');
-
         document.body.parentElement.classList.remove('scroll-lock')
     }
 

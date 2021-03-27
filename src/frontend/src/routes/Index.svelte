@@ -1,18 +1,25 @@
 <script>
     import { onMount } from 'svelte';
+    import { link } from 'svelte-routing';
+    import { writable } from 'svelte/store';
 
     import Header from '../components/Header.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js';
-    import { apiUrl } from '../settings';
+    import { apiUrl, siteTitle } from '../settings.js';
 
 
     let newessCharacters = [];
 
     onMount(async () => {
         const result = await loadNewessCharacters();
-        newessCharacters = result;
+
+        for (let item of result) {
+            newessCharacters.push(writable(item));
+        }
+
+        newessCharacters = newessCharacters;
     });
 
     async function loadNewessCharacters() {
@@ -40,28 +47,30 @@
 </script>
 
 <svelte:head>
-    <title>Look Like | Головна</title>
+    <title>{siteTitle}</title>
 </svelte:head>
 
 <Header/>
 <div class="container">
     <h1>Найновіші образи</h1>
     <div class="characters-grid">
-        {#if newessCharacters.length}
-            {#each newessCharacters as character}
-                <CharactersCard character={character}/>
-            {/each}     
-        {/if}
+        {#each newessCharacters as character}
+            <CharactersCard character={character}/>
+        {/each}
     </div>
+    <div class="black-button-wrapper">
+        <a href="/test1" class="black-button" use:link>Дивитись ще</a>
+    </div>
+
     <h1>Найпопулярніші образи</h1>
     <div class="characters-grid">
-        {#if newessCharacters.length}
-            {#each newessCharacters as character}
-                <CharactersCard character={character}/>
-            {/each}     
-        {/if}
+        {#each newessCharacters as character}
+            <CharactersCard character={character}/>
+        {/each}
     </div>
-    <div style="height: 50px;"></div>
+    <div class="black-button-wrapper">
+        <a href="/test2" class="black-button" use:link>Дивитись ще</a>
+    </div>
 </div>
 
 <style>
@@ -69,5 +78,11 @@
         text-align: center;
         margin-top: 20px;
         color: #383838;
+    }
+
+    .black-button-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0 60px 0;
     }
 </style>

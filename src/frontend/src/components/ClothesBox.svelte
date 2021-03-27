@@ -1,5 +1,5 @@
 <script>
-    import { apiUrl } from '../settings';
+    import { apiUrl } from '../settings.js';
 
 
     export let clothes = [];

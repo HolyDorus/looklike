@@ -4,7 +4,7 @@
     import Header from '../components/Header.svelte';
 
     import { setToken } from '../auth.js'
-    import { apiUrl } from '../settings';
+    import { apiUrl, siteTitle } from '../settings.js';
     import { RegisterFormValidator } from '../form-validators.js';
     import { whooshAnimation } from '../utils.js';
 
@@ -66,11 +66,11 @@
             console.log(e)
             navigate('/oops');
         }
-    };
+    }
 </script>
 
 <svelte:head>
-    <title>Look Like | Реєстрація</title>
+    <title>Реєстрація | {siteTitle}</title>
 </svelte:head>
 
 <Header/>

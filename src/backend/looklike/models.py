@@ -29,6 +29,7 @@ class Character:
     image_path: str
     description: str
     posted_at: datetime
+    likes: int
     clothes: list = field(default_factory=list)
     is_favorite: Optional[bool] = None
 
