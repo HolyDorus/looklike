@@ -4,6 +4,7 @@
     import { navigate } from 'svelte-routing';
 
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js'
@@ -60,7 +61,7 @@
         {/if}
     </div>
 </div>
-<div style="height: 50px;"></div>
+<Footer/>
 
 <style>
     h1 {

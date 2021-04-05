@@ -3,6 +3,7 @@
     import { navigate } from 'svelte-routing';
 
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
     import ClothesBox from './../components/ClothesBox.svelte';
 
     import { apiUrl, siteTitle } from '../settings.js';
@@ -89,6 +90,7 @@
         <button class="black-button" on:click={searchButtonClickHandler}>Підібрати образи</button>
     </div>
 </div>
+<Footer/>
 
 <style>
     h1 {
@@ -100,6 +102,6 @@
     .black-button-wrapper {
         display: flex;
         justify-content: center;
-        padding: 30px 0;
+        margin-top: 30px;
     }
 </style>

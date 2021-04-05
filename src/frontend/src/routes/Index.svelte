@@ -1,9 +1,9 @@
 <script>
     import { onMount } from 'svelte';
-    import { link } from 'svelte-routing';
     import { writable } from 'svelte/store';
 
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
     import CharactersCard from '../components/CharactersCard.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js';
@@ -58,18 +58,12 @@
             <CharactersCard character={character}/>
         {/each}
     </div>
-    <div class="black-button-wrapper">
-        <a href="/test1" class="black-button" use:link>Дивитись ще</a>
-    </div>
 
     <h1>Найпопулярніші образи</h1>
     <div class="characters-grid">
         {#each newessCharacters as character}
             <CharactersCard character={character}/>
         {/each}
-    </div>
-    <div class="black-button-wrapper">
-        <a href="/test2" class="black-button" use:link>Дивитись ще</a>
     </div>
 </div>
 
@@ -79,10 +73,5 @@
         margin-top: 20px;
         color: #383838;
     }
-
-    .black-button-wrapper {
-        display: flex;
-        justify-content: center;
-        margin: 30px 0 60px 0;
-    }
 </style>
+<Footer/>

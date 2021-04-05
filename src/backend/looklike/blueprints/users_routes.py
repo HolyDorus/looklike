@@ -43,6 +43,6 @@ def login():
     if not auth.is_correct_password(data.password, user.password_hash):
         return jsoning({'message': 'Invalid password!'}), 401
 
-    token = auth.create_token(user.id)
+    token = auth.create_token(data={'user_id': user.id})
 
     return jsoning({'access_token': token})

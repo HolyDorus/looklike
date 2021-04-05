@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 
 from pydantic import ValidationError
 
@@ -6,6 +6,7 @@ from looklike.configs import config
 from looklike.blueprints.clothes_routes import clothes_bp
 from looklike.blueprints.characters_routes import characters_bp
 from looklike.blueprints.users_routes import users_bp
+from looklike.utils import jsoning
 
 
 def create_app() -> Flask:
@@ -18,6 +19,6 @@ def create_app() -> Flask:
 
     @app.errorhandler(ValidationError)
     def handle_validation_error(e):
-        return jsonify(e.errors()), 400
+        return jsoning(e.errors()), 400
 
     return app

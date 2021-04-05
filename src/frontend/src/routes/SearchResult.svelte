@@ -5,6 +5,7 @@
     
     import CharactersCard from '../components/CharactersCard.svelte';
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
 
     import { isAuthorized, formatAuthorizationHeader } from '../auth.js'
     import { apiUrl, siteTitle } from '../settings.js';
@@ -97,6 +98,7 @@
         <a class="black-button" href="/search">Обрати інший одяг</a>
     </div>
 </div>
+<Footer/>
 
 <style>
     h1 {
@@ -106,7 +108,7 @@
     }
 
     .black-button-wrapper {
-        padding: 30px 0;
+        margin-top: 30px;
         display: flex;
         justify-content: center;
     }

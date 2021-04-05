@@ -1,5 +1,6 @@
 <script>
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
     
     import { siteTitle } from '../settings.js';
 </script>
@@ -21,6 +22,7 @@
         </div>
     </div>
 </div>
+<Footer/>
 
 <style>
     #notfound {

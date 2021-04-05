@@ -18,7 +18,7 @@ class JWTAuthorization:
         self.hash_iterations = hash_iterations
         self.jwt_algorithm = jwt_algorithm
 
-    def generate_password(self, password: str) -> str:
+    def generate_password_hash(self, password: str) -> str:
         """Creates a hashed password from a raw password"""
         return pbkdf2_hmac(
             hash_name=self.hash_method,
@@ -29,17 +29,10 @@ class JWTAuthorization:
 
     def is_correct_password(self, password: str, hash: str) -> bool:
         """Compares the raw password with a hashed password"""
-        return pbkdf2_hmac(
-            hash_name=self.hash_method,
-            password=password.encode('utf-8'),
-            salt=self.secret_key.encode('utf-8'),
-            iterations=self.hash_iterations
-        ).hex() == hash
+        return self.generate_password_hash(password) == hash
 
-    def create_token(self, user_id: int, exp: Optional[int] = None) -> str:
+    def create_token(self, data: dict, exp: Optional[int] = None) -> str:
         """Creates and returns a JWT with the required data"""
-        data = {'user_id': user_id}
-
         if exp:
             data['exp'] = exp
 
@@ -49,7 +42,7 @@ class JWTAuthorization:
             algorithm=self.jwt_algorithm
         )
 
-    def get_acces_token_from_headers(self, headers: dict) -> Optional[str]:
+    def get_acces_token_from_headers(self, headers: dict) -> str:
         """Retrieves and returns a token from the request headers"""
         auth_data = headers.get('Authorization')
 
@@ -65,7 +58,7 @@ class JWTAuthorization:
 
         return auth_data[7:]
 
-    def get_user_id_from_acces_token(self, token: str) -> Optional[int]:
+    def get_user_id_from_acces_token(self, token: str) -> int:
         """Retrieves and returns user_id from token"""
         try:
             data = jwt.decode(

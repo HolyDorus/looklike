@@ -2,6 +2,7 @@
     import { link, navigate } from 'svelte-routing';
 
     import Header from '../components/Header.svelte';
+    import Footer from '../components/Footer.svelte';
 
     import { setToken } from '../auth.js'
     import { apiUrl, siteTitle } from '../settings.js';
@@ -93,3 +94,4 @@
         <div class="lr-card-additionally">У вас ще немає акаунту? <a href="/register" class="lr-card-link" use:link>Зареєструватися</a></div>
     </div>
 </div>
+<Footer/>

@@ -63,16 +63,6 @@ export function getAllUrlGetParams(url) {
     return obj;
 }
 
-export function get_time_from_unix(unix) {
-    let date = new Date(unix * 1000)
-    return date.toString('HH:MM:ss')
-}
-
-export function get_date_from_unix(unix) {
-    let date = new Date(unix * 1000)
-    return date.toString('dd.MM.yyyy')
-}
-
 export function formatBigNumber(number) {
     if (number > 1_000_000) {
         return `${(number / 1_000_000).toFixed(1)}M`

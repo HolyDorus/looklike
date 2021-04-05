@@ -19,8 +19,8 @@ class ClothesDBHelper:
     def get_all_clothes() -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, name, image_path, parent_id, parent_path FROM '
-                 'all_clothes;')
+                'SELECT id, name, image_path, parent_id, parent_path FROM '
+                'all_clothes;'
             )
             data = cursor.fetchall()
 
@@ -31,9 +31,9 @@ class ClothesDBHelper:
     def get_clothes_by_parent_id(parent_id: int) -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, name, image_path, parent_id, parent_path FROM '
-                 'all_clothes WHERE parent_id = %s ORDER BY '
-                 'display_priority;'),
+                'SELECT id, name, image_path, parent_id, parent_path FROM '
+                'all_clothes WHERE parent_id = %s ORDER BY '
+                'display_priority;',
                 (parent_id,)
             )
             data = cursor.fetchall()
@@ -45,9 +45,9 @@ class ClothesDBHelper:
     def get_primary_clothes() -> list[Clothes]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, name, image_path, parent_id, parent_path FROM '
-                 'all_clothes WHERE parent_path ~ \'*{,2}\' ORDER BY '
-                 'display_priority;')
+                'SELECT id, name, image_path, parent_id, parent_path FROM '
+                'all_clothes WHERE parent_path ~ \'*{,2}\' ORDER BY '
+                'display_priority;'
             )
             data = cursor.fetchall()
 
@@ -57,7 +57,7 @@ class ClothesDBHelper:
     @staticmethod
     def get_clothes_parent_paths(clothes_ids: list[int]) -> list[str]:
         with get_db_cursor() as cursor:
-            query = 'SELECT parent_path FROM all_clothes WHERE id = any(%s)'
+            query = 'SELECT parent_path FROM all_clothes WHERE id = ANY(%s)'
             cursor.execute(query, (clothes_ids,))
             data = cursor.fetchall()
 
@@ -67,13 +67,13 @@ class ClothesDBHelper:
     @staticmethod
     def get_character_clothes(character: Character) -> list[Clothes]:
         with get_db_cursor() as cursor:
-            query = (
+            cursor.execute(
                 'SELECT id, name, image_path, parent_id, parent_path FROM '
                 'all_clothes WHERE id IN(SELECT clothes_id FROM '
                 'clothes_on_characters WHERE character_id = %s) ORDER BY '
-                'display_priority'
+                'display_priority',
+                (character.id,)
             )
-            cursor.execute(query, (character.id,))
             data = cursor.fetchall()
 
         clothes = [Clothes(**item) for item in data]
@@ -88,12 +88,12 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT c.id, c.author_id, c.image_path, c.description, '
-                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
-                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
-                 'fcou.character_id = c.id WHERE c.id IN(SELECT character_id '
-                 'FROM favorite_characters_of_users WHERE user_id = %s) GROUP '
-                 'BY c.id;'),
+                'SELECT c.id, c.author_id, c.image_path, c.description, '
+                'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                'fcou.character_id = c.id WHERE c.id IN(SELECT character_id '
+                'FROM favorite_characters_of_users WHERE user_id = %s) GROUP '
+                'BY c.id;',
                 (user_id,)
             )
             data = cursor.fetchall()
@@ -117,7 +117,7 @@ class CharactersDBHelper:
     def add_to_favorites(character_id: int, user_id: int) -> None:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT EXISTS (SELECT 1 FROM characters WHERE id = %s);'),
+                'SELECT EXISTS (SELECT 1 FROM characters WHERE id = %s);',
                 (character_id,)
             )
             data = cursor.fetchone()
@@ -134,8 +134,8 @@ class CharactersDBHelper:
 
         with get_db_cursor(commit=True) as cursor:
             cursor.execute(
-                ('INSERT INTO favorite_characters_of_users (character_id, '
-                 'user_id) VALUES (%s, %s);'),
+                'INSERT INTO favorite_characters_of_users (character_id, '
+                'user_id) VALUES (%s, %s);',
                 (character_id, user_id)
             )
 
@@ -148,8 +148,8 @@ class CharactersDBHelper:
 
         with get_db_cursor(commit=True) as cursor:
             cursor.execute(
-                ('DELETE FROM favorite_characters_of_users WHERE character_id '
-                 '= %s AND user_id = %s;'),
+                'DELETE FROM favorite_characters_of_users WHERE character_id '
+                '= %s AND user_id = %s;',
                 (character_id, user_id)
             )
 
@@ -160,10 +160,10 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT c.id, c.author_id, c.image_path, c.description, '
-                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
-                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
-                 'fcou.character_id = c.id GROUP BY c.id;')
+                'SELECT c.id, c.author_id, c.image_path, c.description, '
+                'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                'fcou.character_id = c.id GROUP BY c.id;'
             )
             data = cursor.fetchall()
 
@@ -187,10 +187,10 @@ class CharactersDBHelper:
     ) -> Character:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT c.id, c.author_id, c.image_path, c.description, '
-                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
-                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
-                 'fcou.character_id = c.id WHERE c.id = %s GROUP BY c.id;'),
+                'SELECT c.id, c.author_id, c.image_path, c.description, '
+                'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                'fcou.character_id = c.id WHERE c.id = %s GROUP BY c.id;',
                 (character_id,)
             )
             data = cursor.fetchone()
@@ -215,11 +215,11 @@ class CharactersDBHelper:
     ) -> list[Character]:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT c.id, c.author_id, c.image_path, c.description, '
-                 'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
-                 'characters c LEFT JOIN favorite_characters_of_users fcou ON '
-                 'fcou.character_id = c.id GROUP BY c.id ORDER BY c.posted_at '
-                 'DESC LIMIT %s;'),
+                'SELECT c.id, c.author_id, c.image_path, c.description, '
+                'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                'fcou.character_id = c.id GROUP BY c.id ORDER BY c.posted_at '
+                'DESC LIMIT %s;',
                 (limit,)
             )
             data = cursor.fetchall()
@@ -254,10 +254,7 @@ class CharactersDBHelper:
                 )
 
             query = CharactersDBHelper._format_specific_query(parent_paths)
-            print(query)
-            print(parent_paths)
             cursor.execute(query, parent_paths)
-            print('Ok')
             data = cursor.fetchall()
 
         characters = [Character(**item) for item in data]
@@ -277,8 +274,8 @@ class CharactersDBHelper:
     def is_favorite_character(user_id: int, character_id: int) -> bool:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT EXISTS (SELECT 1 FROM favorite_characters_of_users '
-                 'WHERE character_id = %s AND user_id = %s);'),
+                'SELECT EXISTS (SELECT 1 FROM favorite_characters_of_users '
+                'WHERE character_id = %s AND user_id = %s);',
                 (character_id, user_id)
             )
             data = cursor.fetchone()
@@ -326,8 +323,9 @@ class UsersDBHelper:
     def get_user_by_username(username: str) -> User:
         with get_db_cursor() as cursor:
             cursor.execute(
-                ('SELECT id, username, password_hash, registered_at FROM '
-                 'users WHERE username = %s;'), (username,)
+                'SELECT id, username, password_hash, registered_at FROM '
+                'users WHERE username = %s;',
+                (username,)
             )
             data = cursor.fetchone()
 
@@ -357,12 +355,13 @@ class UsersDBHelper:
             )
 
         auth = JWTAuthorization(secret_key=config.SECRET_KEY)
-        password_hash = auth.generate_password(user.password)
+        password_hash = auth.generate_password_hash(user.password)
 
         with get_db_cursor(commit=True) as cursor:
             cursor.execute(
-                ('INSERT INTO users (username, password_hash) VALUES (%s, %s) '
-                 'RETURNING id, registered_at'), (user.username, password_hash)
+                'INSERT INTO users (username, password_hash) VALUES (%s, %s) '
+                'RETURNING id, registered_at',
+                (user.username, password_hash)
             )
             data = cursor.fetchone()
 

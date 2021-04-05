@@ -138,8 +138,9 @@ def find_characters_by_clothes(user_id: Optional[int] = None):
         return jsoning(serialized)
 
     return jsoning({
-        'message': ('You must add query parameter \'clothes\' with array of '
-                    'clothes IDs!')
+        'message':
+            'You must add query parameter \'clothes\' with array of '
+            'clothes IDs!'
     })
 
 
