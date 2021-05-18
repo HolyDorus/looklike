@@ -11,38 +11,67 @@
 
 
     let newessCharacters = [];
+    let popularCharacters = [];
 
+    
     onMount(async () => {
         const result = await loadNewessCharacters();
+        const result2 = await loadPopularCharacters();
 
         for (let item of result) {
             newessCharacters.push(writable(item));
         }
 
+        for (let item of result2) {
+            popularCharacters.push(writable(item));
+        }
+
         newessCharacters = newessCharacters;
+        popularCharacters = popularCharacters;
     });
 
     async function loadNewessCharacters() {
-        let request_headers = {
-            'Accept': 'application/json'
-        };
+        try {
+            let request_headers = {
+                'Accept': 'application/json'
+            };
 
-        if (isAuthorized()) {
-            request_headers['Authorization'] = formatAuthorizationHeader();
+            if (isAuthorized()) {
+                request_headers['Authorization'] = formatAuthorizationHeader();
+            }
+
+            const response = await fetch(`${apiUrl}/characters/filter?type=newness&limit=3`, {
+                method: 'GET',
+                headers: request_headers
+            });
+
+            return await response.json();
         }
-
-        const response = await fetch(`${apiUrl}/characters/filter?type=newness&limit=3`, {
-            method: 'GET',
-            headers: request_headers
-        });
-
-        let responseData = await response.json();
-
-        if (!response.ok) {
+        catch (e) {
             navigate('/oops');
         }
+    };
 
-        return responseData;
+    async function loadPopularCharacters() {
+        try {
+            let request_headers = {
+                'Accept': 'application/json'
+            };
+
+            if (isAuthorized()) {
+                request_headers['Authorization'] = formatAuthorizationHeader();
+            }
+
+            const response = await fetch(`${apiUrl}/characters/filter?type=popularity&limit=3`, {
+                method: 'GET',
+                headers: request_headers
+            });
+
+            return await response.json();
+        }
+        catch (e) {
+            navigate('/oops');
+        }
     };
 </script>
 
@@ -61,7 +90,7 @@
 
     <h1>Найпопулярніші образи</h1>
     <div class="characters-grid">
-        {#each newessCharacters as character}
+        {#each popularCharacters as character}
             <CharactersCard character={character}/>
         {/each}
     </div>
@@ -72,6 +101,10 @@
         text-align: center;
         margin-top: 20px;
         color: #383838;
+    }
+
+    h1:not(:first-of-type) {
+        margin-top: 60px;
     }
 </style>
 <Footer/>

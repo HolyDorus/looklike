@@ -12,8 +12,9 @@
     import { getAllUrlGetParams, whooshAnimation } from '../utils.js';
 
 
-    let error;
     let searchResult = [];
+    let errors = [];
+
 
     onMount(async () => {
         const urlPart = formatUrlPart(window.location.href);
@@ -21,7 +22,7 @@
 
         if (result && Array.isArray(result)){
             if (!result.length) {
-                error = 'На жаль, образів з такими речами не знайдено';
+                errors = ['На жаль, образів з такими речами не знайдено'];
             } else {
                 for (let item of result) {
                     searchResult.push(writable(item));
@@ -43,30 +44,30 @@
     }
 
     async function loadSearchResult(urlPart) {
-        let request_headers = {
-            'Accept': 'application/json'
-        };
+        try {
+            let request_headers = {
+                'Accept': 'application/json'
+            };
 
-        if (isAuthorized()) {
-            request_headers['Authorization'] = formatAuthorizationHeader();
-        }
-
-        const response = await fetch(`${apiUrl}/characters/find${urlPart}`, {
-            method: 'GET',
-            headers: request_headers
-        });
-
-        let responseData = await response.json();
-
-        if (!response.ok) {
-            if (responseData.message === 'One or more Clothes from the list were not found!') {
-                error = 'Не знайдено один або декілька елементів одягу зі списку';
-            } else {
-                navigate('/oops');
+            if (isAuthorized()) {
+                request_headers['Authorization'] = formatAuthorizationHeader();
             }
-        }
 
-        return responseData;
+            const response = await fetch(`${apiUrl}/characters/find${urlPart}`, {
+                method: 'GET',
+                headers: request_headers
+            });
+
+            if (response.status === 404) {
+                errors = ['Не знайдено один або декілька елементів одягу зі списку']
+                return null;
+            }
+
+            return await response.json();
+        }
+        catch (e) {
+            navigate('/oops');
+        }
     }
 </script>
 
@@ -85,11 +86,13 @@
         </div>
     {/if}
 
-    {#if error}
+    {#if errors.length}
         <div in:whooshAnimation class="block-status b-errors">
             <span>Помилки:</span>
             <ul>
-                <li>{error}</li>
+                {#each errors as error}
+                    <li>{error}</li>
+                {/each}
             </ul>
         </div>
     {/if}

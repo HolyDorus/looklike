@@ -88,6 +88,29 @@ def get_filtered_characters(user_id: Optional[int] = None):
         return jsoning(
             CharactersWithClothesSerializer.serialize(filtered_characters)
         )
+    elif filter_type == 'popularity':
+        if filter_limit:
+            try:
+                filter_limit = int(filter_limit)
+            except ValueError:
+                return jsoning(
+                    {'message': 'Argument \'filter_limit\' must be integer!'}
+                ), 400
+
+            filtered_characters = CharactersDBHelper.get_popular_characters(
+                user_id=user_id,
+                limit=filter_limit,
+                with_clothes=True
+            )
+        else:
+            filtered_characters = CharactersDBHelper.get_popular_characters(
+                user_id=user_id,
+                with_clothes=True
+            )
+
+        return jsoning(
+            CharactersWithClothesSerializer.serialize(filtered_characters)
+        )
 
     return jsoning({'message': 'Filter type not allowed!'})
 

@@ -43,10 +43,6 @@
                 body: JSON.stringify({username, password})
             });
 
-            
-            console.log(RegisterResponse.status)
-
-
             if (RegisterResponse.status === 409) {
                 errors = ['Користувач з таким ім\'ям вже існує!']
                 return null;
@@ -64,7 +60,6 @@
             return await LoginResponse.json();
         }
         catch (e) {
-            console.log(e)
             navigate('/oops');
         }
     }

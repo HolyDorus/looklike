@@ -13,6 +13,7 @@
 
     let favoriteCharacters = [];
 
+
     onMount(async () => {
         if (isAuthorized()) {
             const result = await loadFavoriteCharacters();

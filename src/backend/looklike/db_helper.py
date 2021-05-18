@@ -238,6 +238,38 @@ class CharactersDBHelper:
         return newest_characters
 
     @staticmethod
+    def get_popular_characters(
+        user_id: Optional[int] = None,
+        limit: int = 10,
+        with_clothes: bool = False
+    ) -> list[Character]:
+        with get_db_cursor() as cursor:
+            cursor.execute(
+                'SELECT c.id, c.author_id, c.image_path, c.description, '
+                'c.posted_at, COUNT(fcou.character_id) AS likes FROM '
+                'characters c LEFT JOIN favorite_characters_of_users fcou ON '
+                'fcou.character_id = c.id GROUP BY c.id ORDER BY likes '
+                'DESC LIMIT %s;',
+                (limit,)
+            )
+            data = cursor.fetchall()
+
+        popular_characters = [Character(**item) for item in data]
+
+        if with_clothes:
+            CharactersDBHelper._inject_clothes_to_characters(
+                popular_characters
+            )
+
+        if user_id:
+            CharactersDBHelper._inject_is_favorite_field(
+                user_id=user_id,
+                characters=popular_characters
+            )
+
+        return popular_characters
+
+    @staticmethod
     def get_characters_by_clothes(
         clothes_ids: list[int],
         user_id: Optional[int] = None,

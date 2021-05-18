@@ -11,18 +11,19 @@
 
 
     let clothesList = [];
-    let error;
+    let errors = [];
+
 
     onMount(async () => {
         const result = await loadPrimaryClothes();
         clothesList = result;
     });
 
-    function searchButtonClickHandler(event) {
+    function searchButtonClickHandler() {
         const allSelectedItemIds = collectAllSelectedItemIds();
 
         if (!allSelectedItemIds.length) {
-            error = 'Небхідно обрати хоча б один елемент одягу!';
+            errors = ['Небхідно обрати хоча б один елемент одягу!'];
             return;
         }
 
@@ -56,13 +57,18 @@
     }
 
     async function loadPrimaryClothes() {
-        const response = await fetch(`${apiUrl}/clothes/primary`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        return await response.json();
+        try {
+            const response = await fetch(`${apiUrl}/clothes/primary`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            return await response.json();
+        }
+        catch (e) {
+            navigate('/oops');
+        }
     }
 </script>
 
@@ -77,11 +83,13 @@
         <ClothesBox clothes={clothes}/>
     {/each}
     
-    {#if error }
+    {#if errors.length}
         <div in:whooshAnimation class="block-status b-errors">
             <span>Помилки:</span>
             <ul>
-                <li>{error}</li>
+                {#each errors as error}
+                    <li>{error}</li>
+                {/each}
             </ul>
         </div>
     {/if}

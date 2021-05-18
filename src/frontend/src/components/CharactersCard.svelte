@@ -120,7 +120,7 @@
 
     .character-item__image {
         width: 100%;
-        height: 560px;
+        max-height: 560px;
     }
 
     .character-item__image:hover {
