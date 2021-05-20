@@ -1,15 +1,13 @@
 from typing import Optional
 
-from flask import Blueprint, request, json as flask_json
+from flask import Blueprint, request
 
-from looklike.configs import config
 from looklike.db_helper import CharactersDBHelper
 from looklike.exceptions import (
     ObjectNotFoundException,
     CharacterAlreadyInFavorites
 )
 from looklike.serializers import CharactersWithClothesSerializer
-from looklike.redis_client import redis_client, format_cache_key
 from looklike.routes_decorators import authorized_required, authorized_optional
 from looklike.utils import get_ids_from_string, jsoning
 
@@ -131,15 +129,6 @@ def find_characters_by_clothes(user_id: Optional[int] = None):
             }), 400
 
         try:
-            if config.REDIS_CACHING:
-                cache_key = format_cache_key(clothes_ids)
-                cache_value = redis_client.get(cache_key)
-                if cache_value:
-                    response_text = cache_value.decode('utf-8')
-                    return response_text, 200, {
-                        'Content-Type': 'application/json'
-                    }
-
             characters = CharactersDBHelper.get_characters_by_clothes(
                 clothes_ids=clothes_ids,
                 user_id=user_id,
@@ -148,17 +137,9 @@ def find_characters_by_clothes(user_id: Optional[int] = None):
         except ObjectNotFoundException as e:
             return jsoning({'message': str(e)}), 404
 
-        serialized = CharactersWithClothesSerializer.serialize(characters)
-
-        if config.REDIS_CACHING:
-            new_cache_value = flask_json.dumps(serialized)
-            redis_client.set(
-                name=cache_key,
-                value=new_cache_value,
-                ex=config.REDIS_CACHE_EXPIRE
-            )
-
-        return jsoning(serialized)
+        return jsoning(
+            CharactersWithClothesSerializer.serialize(characters)
+        )
 
     return jsoning({
         'message':
