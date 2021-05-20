@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from looklike.db_helper import CharactersDBHelper
 from looklike.exceptions import (
@@ -9,7 +9,7 @@ from looklike.exceptions import (
 )
 from looklike.serializers import CharactersWithClothesSerializer
 from looklike.routes_decorators import authorized_required, authorized_optional
-from looklike.utils import get_ids_from_string, jsoning
+from looklike.utils import get_ids_from_string
 
 
 url_prefix = '/api/v1/characters/'
@@ -24,7 +24,7 @@ def get_characters(user_id: Optional[int] = None):
         user_id=user_id,
         with_clothes=True
     )
-    return jsoning(CharactersWithClothesSerializer.serialize(all_characters))
+    return jsonify(CharactersWithClothesSerializer.serialize(all_characters))
 
 
 @characters_bp.route('<int:character_id>', methods=['GET'])
@@ -36,9 +36,9 @@ def get_character(character_id):
             with_clothes=True
         )
     except ObjectNotFoundException as e:
-        return jsoning({'message': str(e)}), 404
+        return jsonify({'message': str(e)}), 404
 
-    return jsoning(CharactersWithClothesSerializer.serialize(character))
+    return jsonify(CharactersWithClothesSerializer.serialize(character))
 
 
 @characters_bp.route('favorites', methods=['GET'])
@@ -51,9 +51,9 @@ def get_favorite_characters(user_id: int):
             with_clothes=True
         )
     except ObjectNotFoundException as e:
-        return jsoning({'message': str(e)}), 404
+        return jsonify({'message': str(e)}), 404
 
-    return jsoning(CharactersWithClothesSerializer.serialize(characters))
+    return jsonify(CharactersWithClothesSerializer.serialize(characters))
 
 
 @characters_bp.route('filter', methods=['GET'])
@@ -68,7 +68,7 @@ def get_filtered_characters(user_id: Optional[int] = None):
             try:
                 filter_limit = int(filter_limit)
             except ValueError:
-                return jsoning(
+                return jsonify(
                     {'message': 'Argument \'filter_limit\' must be integer!'}
                 ), 400
 
@@ -83,7 +83,7 @@ def get_filtered_characters(user_id: Optional[int] = None):
                 with_clothes=True
             )
 
-        return jsoning(
+        return jsonify(
             CharactersWithClothesSerializer.serialize(filtered_characters)
         )
     elif filter_type == 'popularity':
@@ -91,7 +91,7 @@ def get_filtered_characters(user_id: Optional[int] = None):
             try:
                 filter_limit = int(filter_limit)
             except ValueError:
-                return jsoning(
+                return jsonify(
                     {'message': 'Argument \'filter_limit\' must be integer!'}
                 ), 400
 
@@ -106,11 +106,11 @@ def get_filtered_characters(user_id: Optional[int] = None):
                 with_clothes=True
             )
 
-        return jsoning(
+        return jsonify(
             CharactersWithClothesSerializer.serialize(filtered_characters)
         )
 
-    return jsoning({'message': 'Filter type not allowed!'})
+    return jsonify({'message': 'Filter type not allowed!'})
 
 
 @characters_bp.route('find', methods=['GET'])
@@ -123,7 +123,7 @@ def find_characters_by_clothes(user_id: Optional[int] = None):
         try:
             clothes_ids = get_ids_from_string(clothes_list)
         except ValueError:
-            return jsoning({
+            return jsonify({
                 'message':
                     'Argument \'clothes\' must be array of integers!'
             }), 400
@@ -135,13 +135,13 @@ def find_characters_by_clothes(user_id: Optional[int] = None):
                 with_clothes=True
             )
         except ObjectNotFoundException as e:
-            return jsoning({'message': str(e)}), 404
+            return jsonify({'message': str(e)}), 404
 
-        return jsoning(
+        return jsonify(
             CharactersWithClothesSerializer.serialize(characters)
         )
 
-    return jsoning({
+    return jsonify({
         'message':
             'You must add query parameter \'clothes\' with array of '
             'clothes IDs!'
@@ -158,11 +158,11 @@ def add_character_to_favorites(character_id: int, user_id: int):
             user_id=user_id
         )
     except ObjectNotFoundException as e:
-        return jsoning({'message': str(e)}), 404
+        return jsonify({'message': str(e)}), 404
     except CharacterAlreadyInFavorites as e:
-        return jsoning({'message': str(e)}), 400
+        return jsonify({'message': str(e)}), 400
 
-    return jsoning({'message': 'Character added to favorites'})
+    return jsonify({'message': 'Character added to favorites'})
 
 
 @characters_bp.route(
@@ -178,6 +178,6 @@ def remove_character_from_favorites(character_id: int, user_id: int):
             user_id=user_id
         )
     except ObjectNotFoundException as e:
-        return jsoning({'message': str(e)}), 404
+        return jsonify({'message': str(e)}), 404
 
-    return jsoning({'message': 'Character removed from favorites'})
+    return jsonify({'message': 'Character removed from favorites'})

@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from looklike.authorizations import JWTAuthorization
 from looklike.configs import config
@@ -8,7 +8,7 @@ from looklike.exceptions import (
     UserAlreadyExistsException
 )
 from looklike.models import UserRegistration, UserLogin
-from looklike.utils import jsoning
+from looklike.utils import raw_json_to_response
 
 
 url_prefix = '/api/v1/users/'
@@ -23,9 +23,9 @@ def register():
     try:
         user = UsersDBHelper.create_user(data)
     except UserAlreadyExistsException as e:
-        return jsoning({'message': str(e)}), 409
+        return jsonify({'message': str(e)}), 409
 
-    return jsoning(user.json(exclude={'password_hash'})), 201
+    return raw_json_to_response(user.json(exclude={'password_hash'})), 201
 
 
 @users_bp.route('login', methods=['POST'])
@@ -36,13 +36,13 @@ def login():
     try:
         user = UsersDBHelper.get_user_by_username(data.username)
     except ObjectNotFoundException as e:
-        return jsoning({"message": str(e)}), 404
+        return jsonify({"message": str(e)}), 404
 
     auth = JWTAuthorization(secret_key=config.SECRET_KEY)
 
     if not auth.is_correct_password(data.password, user.password_hash):
-        return jsoning({'message': 'Invalid password!'}), 401
+        return jsonify({'message': 'Invalid password!'}), 401
 
     token = auth.create_token(data={'user_id': user.id})
 
-    return jsoning({'access_token': token})
+    return jsonify({'access_token': token})
